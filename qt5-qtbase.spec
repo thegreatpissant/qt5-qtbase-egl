@@ -8,7 +8,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.0.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -25,7 +25,7 @@ Patch2: qtbase-multilib_optflags.patch
 Patch1341: 0341-Rename-qAbs-Function-for-timeval.patch
 
 # macros
-%define _qt5 qt5
+%define _qt5 %{name}
 %define _qt5_prefix %{_libdir}/qt5
 %define _qt5_archdatadir %{_libdir}/qt5
 # -devel bindir items (still) conflict with qt4
