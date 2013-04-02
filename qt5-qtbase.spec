@@ -5,15 +5,17 @@
 # support qtchooser (adds qtchooser .conf file)
 #define qtchooser 1
 
+%define pre rc1
+
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.0.1
-Release: 6%{?dist}
+Version: 5.0.2
+Release: 0.1.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://releases.qt-project.org/qt5%{?pre:/%{pre}}/%{version}/submodules_tar/qtbase-opensource-src-%{version}%{?pre:-%{pre}}.tar.xz
+Source0: http://releases.qt-project.org/qt5/%{version}%{?pre:-%{pre}}/submodules_tar/qtbase-opensource-src-%{version}.tar.xz
 
 # help build on some lowmem archs, e.g. drop hard-coded -O3 optimization on some files
 Patch1: qtbase-opensource-src-5.0.1-lowmem.patch
@@ -137,13 +139,13 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 
 %prep
-%setup -q -n qtbase-opensource-src-%{version}%{?pre:-%{pre}}
+%setup -q -n qtbase-opensource-src-%{version}
 
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
-%patch1341 -p1 -b .0341
+#patch1341 -p1 -b .0341
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -206,6 +208,7 @@ popd
   -openssl-linked \
   -optimized-qmake \
   -nomake examples \
+  -nomake tests \
   -no-pch \
   -no-rpath \
   -no-separate-debug-info \
@@ -457,6 +460,9 @@ popd
 
 
 %changelog
+* Tue Apr 02 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-0.1.rc1
+- 5.0.2-rc1
+
 * Sat Mar 16 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.1-6
 - pull in upstream gcc-4.8.0 buildfix
 
