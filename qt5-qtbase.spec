@@ -145,7 +145,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
-#patch1341 -p1 -b .0341
+%patch1341 -p1 -b .0341
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
