@@ -8,7 +8,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.0.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -24,6 +24,7 @@ Patch2: qtbase-multilib_optflags.patch
 ##upstream patches
 # https://bugzilla.redhat.com/929227
 # https://codereview.qt-project.org/52778
+# https://codereview.qt-project.org/53449
 Patch100: qtbase-opensource-src-5.0.2-cmake_path.patch
 Patch1341: 0341-Rename-qAbs-Function-for-timeval.patch
 
@@ -327,6 +328,21 @@ done
 popd
 
 
+## work-in-progress, doesn't work yet -- rex
+%if 0
+%check
+export CMAKE_PREFIX_PATH=%{buildroot}%{_prefix}
+export CTEST_OUTPUT_ON_FAILURE=1
+export PATH=%{buildroot}%{_bindir}:$PATH
+export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
+mkdir tests/auto/cmake/%{_target_platform}
+pushd tests/auto/cmake/%{_target_platform}
+cmake ..
+ctest --output-on-failure
+popd
+%endif
+
+
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -462,6 +478,9 @@ popd
 
 
 %changelog
+* Wed Apr 10 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-2
+- more cmake_path love (#929227)
+
 * Wed Apr 10 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.0.2-1
 - 5.0.2
 - fix cmake config (#929227)

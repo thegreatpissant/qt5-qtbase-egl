@@ -10,3 +10,16 @@ diff -up qtbase-opensource-src-5.0.2/mkspecs/features/data/cmake/Qt5BasicConfig.
              )
          endif()
  
+diff -up qtbase-opensource-src-5.0.2/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in.cmake_path qtbase-opensource-src-5.0.2/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in
+diff -up qtbase-opensource-src-5.0.2/src/corelib/Qt5CoreMacros.cmake.cmake_path qtbase-opensource-src-5.0.2/src/corelib/Qt5CoreMacros.cmake
+--- qtbase-opensource-src-5.0.2/src/corelib/Qt5CoreMacros.cmake.cmake_path	2013-04-08 19:11:13.000000000 -0500
++++ qtbase-opensource-src-5.0.2/src/corelib/Qt5CoreMacros.cmake	2013-04-10 12:47:56.296486039 -0500
+@@ -234,7 +234,7 @@ if (NOT CMAKE_VERSION VERSION_LESS 2.8.9
+ 
+         foreach(_module ${_qt5_modules})
+             if (NOT Qt5${_module}_FOUND)
+-                find_package(Qt5${_module} PATHS ${_qt5Core_install_prefix} NO_DEFAULT_PATH)
++                find_package(Qt5${_module} PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH)
+                 if (NOT Qt5${_module}_FOUND)
+                     message(FATAL_ERROR "Can not use \"${_module}\" module which has not yet been found.")
+                 endif()
