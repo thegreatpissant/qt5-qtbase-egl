@@ -8,7 +8,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.0.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -16,7 +16,7 @@ Url: http://qt-project.org/
 Source0: http://releases.qt-project.org/qt5/%{version}%{?pre:-%{pre}}/submodules/qtbase-opensource-src-%{version}.tar.xz
 
 # help build on some lowmem archs, e.g. drop hard-coded -O3 optimization on some files
-Patch1: qtbase-opensource-src-5.0.1-lowmem.patch
+Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
@@ -478,6 +478,9 @@ popd
 
 
 %changelog
+* Fri Apr 12 2013 Dan Horák <dan[at]danny.cz> - 5.0.2-3
+- rebase the lowmem patch
+
 * Wed Apr 10 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-2
 - more cmake_path love (#929227)
 

@@ -1,0 +1,12 @@
+diff -up qtbase-opensource-src-5.0.2/src/gui/painting/qdrawhelper.cpp.lowmem qtbase-opensource-src-5.0.2/src/gui/painting/qdrawhelper.cpp
+--- qtbase-opensource-src-5.0.2/src/gui/painting/qdrawhelper.cpp.lowmem	2013-04-12 09:13:54.000000000 +0200
++++ qtbase-opensource-src-5.0.2/src/gui/painting/qdrawhelper.cpp	2013-04-12 09:14:01.000000000 +0200
+@@ -45,7 +45,7 @@
+ 
+ #    if (__GNUC__ * 100 + __GNUC_MINOR__ * 10 + __GNUC_PATCHLEVEL__ < 473)
+ // From GCC 4.7.3 onwards, GCC optimize can result in gcc bailing out with OOM
+-#        pragma GCC optimize "O3"
++//#        pragma GCC optimize "O3"
+ #    endif
+ 
+ #    if defined(__i386__) && defined(__SSE2__) && !defined(__SSE2_MATH__)
