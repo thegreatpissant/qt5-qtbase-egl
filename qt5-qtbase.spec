@@ -8,7 +8,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.0.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -154,11 +154,9 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 
 # lowmem hacks
-%ifarch %{arm} s390
-## FIXME, -O2 still injected somewhere it seems -- rex
-#RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-O2|-O1|g'`
+#ifarch %{arm} s390
 %patch1 -p1 -b .lowmem
-%endif
+#endif
 
 %define platform linux-g++
 %ifarch %{multilib_archs}
@@ -478,6 +476,9 @@ popd
 
 
 %changelog
+* Thu Apr 18 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-4
+- respin lowmem patch to apply (unconditinally) to gcc-4.7.2 too
+
 * Fri Apr 12 2013 Dan Horák <dan[at]danny.cz> - 5.0.2-3
 - rebase the lowmem patch
 
