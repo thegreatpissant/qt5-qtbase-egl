@@ -477,7 +477,7 @@ popd
 
 %changelog
 * Thu Apr 18 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-4
-- respin lowmem patch to apply (unconditinally) to gcc-4.7.2 too
+- respin lowmem patch to apply (unconditionally) to gcc-4.7.2 too
 
 * Fri Apr 12 2013 Dan Horák <dan[at]danny.cz> - 5.0.2-3
 - rebase the lowmem patch
