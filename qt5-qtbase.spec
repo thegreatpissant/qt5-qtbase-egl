@@ -8,7 +8,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.0.2
-Release: 5%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -159,6 +159,11 @@ RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 #endif
 
 %define platform linux-g++
+%ifarch %{multilib_archs}
+%if "%{?__isa_bits}" == "64"
+%define platform linux-g++-64
+%endif
+%endif
 
 sed -i -e "s|-O2|$RPM_OPT_FLAGS|g" \
   mkspecs/%{platform}/qmake.conf 
@@ -471,9 +476,6 @@ popd
 
 
 %changelog
-* Fri Apr 19 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-5
-- use platform linux-g++ everywhere
-
 * Thu Apr 18 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-4
 - respin lowmem patch to apply (unconditionally) to gcc-4.7.2 too
 
