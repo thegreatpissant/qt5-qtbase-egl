@@ -24,6 +24,7 @@ Patch2: qtbase-multilib_optflags.patch
 
 # upstreamable patches
 # support poll
+# https://bugreports.qt-project.org/browse/QTBUG-27195
 patch50: qt5-poll.patch
 
 ##upstream patches
@@ -484,7 +485,7 @@ popd
 
 %changelog
 * Wed May 08 2013 Than Ngo <than@redhat.com> - 5.0.2-5
-- add poll support, thanks to fweimer@redhat.com
+- add poll support, thanks to fweimer@redhat.com (QTBUG-27195)
 
 * Thu Apr 18 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-4
 - respin lowmem patch to apply (unconditionally) to gcc-4.7.2 too
