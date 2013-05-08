@@ -8,7 +8,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.0.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -20,6 +20,11 @@ Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
+
+
+# upstreamable patches
+# support poll
+patch50: qt5-poll.patch
 
 ##upstream patches
 # https://bugzilla.redhat.com/929227
@@ -146,6 +151,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
+
+%patch50 -p1 -b .poll
 
 %patch100 -p1 -b .cmake_path
 %patch1341 -p1 -b .0341
@@ -476,6 +483,9 @@ popd
 
 
 %changelog
+* Wed May 08 2013 Than Ngo <than@redhat.com> - 5.0.2-5
+- add poll support, thanks to fweimer@redhat.com
+
 * Thu Apr 18 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-4
 - respin lowmem patch to apply (unconditionally) to gcc-4.7.2 too
 
