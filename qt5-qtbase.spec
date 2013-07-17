@@ -8,7 +8,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.0.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -484,6 +484,9 @@ popd
 
 
 %changelog
+* Wed Jul 17 2013 Petr Pisar <ppisar@redhat.com> - 5.0.2-6
+- Perl 5.18 rebuild
+
 * Wed May 08 2013 Than Ngo <than@redhat.com> - 5.0.2-5
 - add poll support, thanks to fweimer@redhat.com (QTBUG-27195)
 
