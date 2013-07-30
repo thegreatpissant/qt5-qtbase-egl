@@ -3,12 +3,12 @@
 %define multilib_basearchs x86_64 ppc64 s390x sparc64
 
 # support qtchooser (adds qtchooser .conf file)
-#define qtchooser 1
+%define qtchooser 1
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.0.2
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -484,6 +484,9 @@ popd
 
 
 %changelog
+* Tue Jul 30 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-7
+- enable qtchooser support
+
 * Wed Jul 17 2013 Petr Pisar <ppisar@redhat.com> - 5.0.2-6
 - Perl 5.18 rebuild
 
