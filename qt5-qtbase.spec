@@ -8,7 +8,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.0.2
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -484,6 +484,9 @@ popd
 
 
 %changelog
+* Sat Aug 03 2013 Petr Pisar <ppisar@redhat.com> - 5.0.2-8
+- Perl 5.18 rebuild
+
 * Tue Jul 30 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-7
 - enable qtchooser support
 
