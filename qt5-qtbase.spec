@@ -408,7 +408,17 @@ popd
 %if "%{_qt5_headerdir}" != "%{_includedir}"
 %dir %{_qt5_headerdir}
 %endif
-%{_qt5_headerdir}/Qt*/
+%{_qt5_headerdir}/QtConcurrent/
+%{_qt5_headerdir}/QtCore/
+%{_qt5_headerdir}/QtDBus/
+%{_qt5_headerdir}/QtGui/
+%{_qt5_headerdir}/QtNetwork/
+%{_qt5_headerdir}/QtOpenGL/
+%{_qt5_headerdir}/QtPrintSupport/
+%{_qt5_headerdir}/QtSql/
+%{_qt5_headerdir}/QtTest/
+%{_qt5_headerdir}/QtWidgets/
+%{_qt5_headerdir}/QtXml/
 %{_qt5_archdatadir}/mkspecs/
 %{_qt5_libdir}/libQt5Concurrent.prl
 %{_qt5_libdir}/libQt5Concurrent.so
@@ -433,16 +443,44 @@ popd
 %{_qt5_libdir}/libQt5Xml.prl
 %{_qt5_libdir}/libQt5Xml.so
 %dir %{_qt5_libdir}/cmake/
-%{_qt5_libdir}/cmake/Qt5*/
-%{_qt5_libdir}/pkgconfig/Qt5*.pc
+%{_qt5_libdir}/cmake/Qt5/
+%{_qt5_libdir}/cmake/Qt5Concurrent/
+%{_qt5_libdir}/cmake/Qt5Core/
+%{_qt5_libdir}/cmake/Qt5DBus/
+%{_qt5_libdir}/cmake/Qt5Gui/
+%{_qt5_libdir}/cmake/Qt5Network/
+%{_qt5_libdir}/cmake/Qt5OpenGL/
+%{_qt5_libdir}/cmake/Qt5PrintSupport/
+%{_qt5_libdir}/cmake/Qt5Sql/
+%{_qt5_libdir}/cmake/Qt5Test/
+%{_qt5_libdir}/cmake/Qt5Widgets/
+%{_qt5_libdir}/cmake/Qt5Xml/
+%{_qt5_libdir}/pkgconfig/Qt5.pc
+%{_qt5_libdir}/pkgconfig/Qt5Concurrent.pc
+%{_qt5_libdir}/pkgconfig/Qt5Core.pc
+%{_qt5_libdir}/pkgconfig/Qt5DBus.pc
+%{_qt5_libdir}/pkgconfig/Qt5Gui.pc
+%{_qt5_libdir}/pkgconfig/Qt5Network.pc
+%{_qt5_libdir}/pkgconfig/Qt5OpenGL.pc
+%{_qt5_libdir}/pkgconfig/Qt5PrintSupport.pc
+%{_qt5_libdir}/pkgconfig/Qt5Sql.pc
+%{_qt5_libdir}/pkgconfig/Qt5Test.pc
+%{_qt5_libdir}/pkgconfig/Qt5Widgets.pc
+%{_qt5_libdir}/pkgconfig/Qt5Xml.pc
 
 %files static
 %{_qt5_libdir}/libQt5Bootstrap.*a
 %{_qt5_libdir}/libQt5Bootstrap.prl
+%{_qt5_libdir}/pkgconfig/Qt5Bootstrap.pc
+%{_qt5_headerdir}/QtOpenGLExtensions/
 %{_qt5_libdir}/libQt5OpenGLExtensions.*a
 %{_qt5_libdir}/libQt5OpenGLExtensions.prl
+%{_qt5_libdir}/cmake/Qt5OpenGLExtensions/
+%{_qt5_libdir}/pkgconfig/Qt5OpenGLExtensions.pc
+%{_qt5_headerdir}/QtPlatformSupport/
 %{_qt5_libdir}/libQt5PlatformSupport.*a
 %{_qt5_libdir}/libQt5PlatformSupport.prl
+%{_qt5_libdir}/pkgconfig/Qt5PlatformSupport.pc
 
 %files ibase
 %{_qt5_plugindir}/sqldrivers/libqsqlibase.so
@@ -484,7 +522,7 @@ popd
 
 
 %changelog
-* Tue Aug 27 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.0-1
+* Tue Aug 27 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-1
 - 5.1.1
 
 * Sat Aug 03 2013 Petr Pisar <ppisar@redhat.com> - 5.0.2-8
