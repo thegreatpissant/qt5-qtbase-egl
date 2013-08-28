@@ -4,16 +4,17 @@
 
 # support qtchooser (adds qtchooser .conf file)
 %define qtchooser 1
+%global qt_module qtbase
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.0.2
-Release: 8%{?dist}
+Version: 5.1.1
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://releases.qt-project.org/qt5/%{version}%{?pre:-%{pre}}/submodules/qtbase-opensource-src-%{version}.tar.xz
+Source0: http://download.qt-project.org/official_releases/qt/5.1/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 
 # help build on some lowmem archs, e.g. drop hard-coded -O3 optimization on some files
 Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
@@ -21,18 +22,13 @@ Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
 
-
 # upstreamable patches
 # support poll
 # https://bugreports.qt-project.org/browse/QTBUG-27195
-patch50: qt5-poll.patch
+# NEEDS REBASE
+Patch50: qt5-poll.patch
 
 ##upstream patches
-# https://bugzilla.redhat.com/929227
-# https://codereview.qt-project.org/52778
-# https://codereview.qt-project.org/53449
-Patch100: qtbase-opensource-src-5.0.2-cmake_path.patch
-Patch1341: 0341-Rename-qAbs-Function-for-timeval.patch
 
 # macros
 %define _qt5 %{name}
@@ -153,10 +149,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
-%patch50 -p1 -b .poll
-
-%patch100 -p1 -b .cmake_path
-%patch1341 -p1 -b .0341
+#patch50 -p1 -b .poll
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -381,7 +374,11 @@ popd
 %dir %{_qt5_plugindir}/generic/
 %dir %{_qt5_plugindir}/imageformats/
 %dir %{_qt5_plugindir}/platforminputcontexts/
+%{_qt5_plugindir}/platforminputcontexts/libcomposeplatforminputcontextplugin.so
 %dir %{_qt5_plugindir}/platforms/
+%{_qt5_plugindir}/platforms/libqoffscreen.so
+%dir %{_qt5_plugindir}/platformthemes/
+%{_qt5_plugindir}/platformthemes/libqgtk2.so
 %dir %{_qt5_plugindir}/printsupport/
 %dir %{_qt5_plugindir}/sqldrivers/
 %{_qt5_plugindir}/sqldrivers/libqsqlite.so
@@ -441,6 +438,8 @@ popd
 %files static
 %{_qt5_libdir}/libQt5Bootstrap.*a
 %{_qt5_libdir}/libQt5Bootstrap.prl
+%{_qt5_libdir}/libQt5OpenGLExtensions.*a
+%{_qt5_libdir}/libQt5OpenGLExtensions.prl
 %{_qt5_libdir}/libQt5PlatformSupport.*a
 %{_qt5_libdir}/libQt5PlatformSupport.prl
 
@@ -484,6 +483,9 @@ popd
 
 
 %changelog
+* Tue Aug 27 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.0-1
+- 5.1.1
+
 * Sat Aug 03 2013 Petr Pisar <ppisar@redhat.com> - 5.0.2-8
 - Perl 5.18 rebuild
 
