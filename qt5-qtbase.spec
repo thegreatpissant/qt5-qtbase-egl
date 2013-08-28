@@ -91,6 +91,7 @@ handling.
 %package devel
 Summary: Development files for %{name} 
 Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}-x11%{?_isa}
 Requires: pkgconfig(gl)
 %description devel
 %{summary}.
