@@ -66,14 +66,15 @@ BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(glesv2) pkgconfig(gl)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gtk+-2.0)
-BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(NetworkManager)
 BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpng)
-%if 0%{?fedora} > 17
+%if 0%{?fedora} || 0%{?rhel} > 6
+BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
 %else
+BuildRequires: libicu-devel
 %define pcre -qt-pcre
 %endif
 BuildRequires: pkgconfig(sqlite3) 
