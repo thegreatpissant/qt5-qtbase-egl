@@ -1,0 +1,21 @@
+diff -up qtbase-opensource-src-5.1.1/src/3rdparty/sha3/KeccakF-1600-opt64.c.ppc64 qtbase-opensource-src-5.1.1/src/3rdparty/sha3/KeccakF-1600-opt64.c
+--- qtbase-opensource-src-5.1.1/src/3rdparty/sha3/KeccakF-1600-opt64.c.ppc64	2013-08-25 13:03:42.000000000 -0500
++++ qtbase-opensource-src-5.1.1/src/3rdparty/sha3/KeccakF-1600-opt64.c	2013-09-06 22:29:03.687899748 -0500
+@@ -324,7 +324,7 @@ static void KeccakPermutation(unsigned c
+     KeccakPermutationOnWords((UINT64*)state);
+ }
+ 
+-#if 0 // Unused in the Qt configuration
++#if 1 // Unused in the Qt configuration
+ static void fromBytesToWord(UINT64 *word, const UINT8 *bytes)
+ {
+     unsigned int i;
+@@ -445,7 +445,7 @@ static void KeccakAbsorb(unsigned char *
+ #endif
+ }
+ 
+-#if 0 // Unused in the Qt configuration
++#if 1 // Unused in the Qt configuration
+ static void fromWordToBytes(UINT8 *bytes, const UINT64 word)
+ {
+     unsigned int i;

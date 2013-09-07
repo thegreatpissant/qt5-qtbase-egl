@@ -27,6 +27,8 @@ Patch2: qtbase-multilib_optflags.patch
 # https://bugreports.qt-project.org/browse/QTBUG-27195
 # NEEDS REBASE
 Patch50: qt5-poll.patch
+# fix ppc64 build
+Patch51: qtbase-opensource-src-5.1.1-ppc64.patch
 
 ##upstream patches
 
@@ -156,6 +158,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 #patch50 -p1 -b .poll
+%patch51 -p1 -b .ppc64
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
