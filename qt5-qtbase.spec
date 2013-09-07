@@ -9,7 +9,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.1.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -65,15 +65,17 @@ BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gtk+-2.0)
+BuildRequires: pkgconfig(libpng)
+BuildRequires: pkgconfig(libudev)
 BuildRequires: pkgconfig(NetworkManager)
 BuildRequires: pkgconfig(openssl)
-BuildRequires: pkgconfig(libpng)
 %if 0%{?fedora} || 0%{?rhel} > 6
 BuildRequires: pkgconfig(atspi-2)
 BuildRequires: pkgconfig(glesv2)
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
+BuildRequires: pkgconfig(xkbcommon)
 %else
 BuildRequires: libicu-devel
 %define pcre -qt-pcre
@@ -524,6 +526,9 @@ popd
 
 
 %changelog
+* Fri Sep 06 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-2
+- BR: pkgconfig(libudev) pkgconfig(xkbcommon)
+
 * Tue Aug 27 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-1
 - 5.1.1
 
