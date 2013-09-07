@@ -75,6 +75,7 @@ BuildRequires: pkgconfig(glesv2)
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
+BuildRequires: pkgconfig(xcb-xkb)
 BuildRequires: pkgconfig(xkbcommon)
 %else
 BuildRequires: libicu-devel
@@ -527,7 +528,7 @@ popd
 
 %changelog
 * Fri Sep 06 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-2
-- BR: pkgconfig(libudev) pkgconfig(xkbcommon)
+- BR: pkgconfig(libudev) pkgconfig(xkbcommon) pkgconfig(xcb-xkb)
 
 * Tue Aug 27 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-1
 - 5.1.1
