@@ -9,12 +9,15 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.1.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
 Source0: http://download.qt-project.org/official_releases/qt/5.1/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+
+# http://bugzilla.redhat.com/1005482
+ExcludeArch: ppc64 ppc
 
 # help build on some lowmem archs, e.g. drop hard-coded -O3 optimization on some files
 Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
@@ -27,8 +30,6 @@ Patch2: qtbase-multilib_optflags.patch
 # https://bugreports.qt-project.org/browse/QTBUG-27195
 # NEEDS REBASE
 Patch50: qt5-poll.patch
-# fix ppc64 build
-Patch51: qtbase-opensource-src-5.1.1-ppc64.patch
 
 ##upstream patches
 
@@ -158,7 +159,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 #patch50 -p1 -b .poll
-%patch51 -p1 -b .ppc64
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -530,6 +530,9 @@ popd
 
 
 %changelog
+* Sat Sep 07 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-3
+- ExcludeArch: ppc64 ppc (#1005482)
+
 * Fri Sep 06 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-2
 - BR: pkgconfig(libudev) pkgconfig(xkbcommon) pkgconfig(xcb-xkb)
 
