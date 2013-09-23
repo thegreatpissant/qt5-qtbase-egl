@@ -6,10 +6,16 @@
 %define qtchooser 1
 %global qt_module qtbase
 
+%if 0%{?fedora} > 18
+%define rpm_macros_dir %{_rpmconfigdir}/macros.d
+%else
+%define rpm_macros_dir %{_sysconfdir}/rpm
+%endif
+
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.1.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -264,8 +270,8 @@ Version: %{version}
 EOF
 
 # rpm macros
-mkdir -p %{buildroot}%{_sysconfdir}/rpm
-cat >%{buildroot}%{_sysconfdir}/rpm/macros.qt5<<EOF
+mkdir -p %{buildroot}%{rpm_macros_dir}
+cat >%{buildroot}%{rpm_macros_dir}/macros.qt5<<EOF
 %%_qt5 %{name}
 %%_qt5_epoch %{?epoch}%{!?epoch:0}
 %%_qt5_version %{version}
@@ -277,14 +283,14 @@ cat >%{buildroot}%{_sysconfdir}/rpm/macros.qt5<<EOF
 %%_qt5_docdir %%{_docdir}/qt5
 %%_qt5_examples %%{_qt5_prefix}/examples
 %%_qt5_headerdir %%{_includedir}/qt5
-%%_qt5_importdir %{_qt5_archdatadir}/imports 
+%%_qt5_importdir %%{_qt5_archdatadir}/imports
 %%_qt5_libdir %%{_libdir}
-%%_qt5_libexecdir %{_qt5_archdatadir}/libexec
-%%_qt5_plugindir %{_qt5_archdatadir}/plugins 
+%%_qt5_libexecdir %%{_qt5_archdatadir}/libexec
+%%_qt5_plugindir %%{_qt5_archdatadir}/plugins
 %%_qt5_qmake %%{_qt5_bindir}/qmake
 %%_qt5_settingsdir %%{_sysconfdir}/xdg
-%%_qt5_sysconfdir %%{_qt5_settingsdir} 
-%%_qt5_translationdir %%{_datadir}/qt5/translations 
+%%_qt5_sysconfdir %%{_qt5_settingsdir}
+%%_qt5_translationdir %%{_datadir}/qt5/translations
 EOF
 
 # create/own dirs
@@ -393,7 +399,7 @@ popd
 %{_qt5_plugindir}/sqldrivers/libqsqlite.so
 
 %files devel
-%{_sysconfdir}/rpm/macros.qt5
+%{rpm_macros_dir}/macros.qt5
 %if "%{_qt5_bindir}" != "%{_bindir}"
 %dir %{_qt5_bindir}
 %endif
@@ -530,6 +536,9 @@ popd
 
 
 %changelog
+* Wed Sep 11 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-4
+- macros.qt5: use newer location, use unexpanded macros
+
 * Sat Sep 07 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-3
 - ExcludeArch: ppc64 ppc (#1005482)
 
