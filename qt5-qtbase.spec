@@ -167,7 +167,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 #patch50 -p1 -b .poll
-patch51 -p1 -b .bigendian
+%patch51 -p1 -b .bigendian
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
