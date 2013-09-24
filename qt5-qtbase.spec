@@ -15,7 +15,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.1.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -36,6 +36,8 @@ Patch2: qtbase-multilib_optflags.patch
 # https://bugreports.qt-project.org/browse/QTBUG-27195
 # NEEDS REBASE
 Patch50: qt5-poll.patch
+# fix big endian builds
+Patch51: qtbase-opensource-src-5.1.1-bigendian.patch
 
 ##upstream patches
 
@@ -165,6 +167,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 #patch50 -p1 -b .poll
+patch51 -p1 -b .bigendian
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -536,6 +539,9 @@ popd
 
 
 %changelog
+* Mon Sep 23 2013 Dan Horák <dan[at]danny.cz> - 5.1.1-5
+- fix big endian builds
+
 * Wed Sep 11 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-4
 - macros.qt5: use newer location, use unexpanded macros
 
