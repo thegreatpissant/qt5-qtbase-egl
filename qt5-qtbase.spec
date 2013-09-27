@@ -12,8 +12,9 @@
 %define rpm_macros_dir %{_sysconfdir}/rpm
 %endif
 
-# define to build docs (currently broken)
-#define docs 1
+# define to build docs, need to undef this for bootstrapping
+# where qt5-qttools builds are not yet available
+%define docs 1
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
@@ -117,12 +118,16 @@ Requires: pkgconfig(gl)
 %description devel
 %{summary}.
 
+%if 0%{?docs}
 %package doc
 Summary: API documentation for %{name}
 Requires: %{name} = %{version}-%{release}
+# for qhelpgenerator
+BuildRequires: qt5-qttools-devel
 BuildArch: noarch
 %description doc
 %{summary}.
+%endif
 
 %package static 
 Summary: Static library files for %{name}
@@ -255,12 +260,13 @@ popd
 make %{?_smp_mflags}
 
 %if 0%{?docs}
-make docs
+# wierd but necessary, to force regeration to use just-built qdoc
+rm -fv src/corelib/Makefile
+make %{?_smp_mflags} docs
 %endif
 
 
 %install
-
 make install INSTALL_ROOT=%{buildroot}
 
 %if 0%{?docs}
@@ -577,7 +583,7 @@ popd
 
 %changelog
 * Fri Sep 27 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.1.1-6
-- -doc subpkg (not enabled, needswork)
+- -doc subpkg
 - enable %%check
 
 * Mon Sep 23 2013 Dan Horák <dan[at]danny.cz> - 5.1.1-5
