@@ -15,7 +15,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.1.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -62,6 +62,8 @@ Patch51: qtbase-opensource-src-5.1.1-bigendian.patch
 %define _qt5_sysconfdir %{_qt5_settingsdir} 
 %define _qt5_translationdir %{_datadir}/qt5/translations
 
+# for %%check
+BuildRequires: cmake
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: findutils
@@ -110,6 +112,13 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-x11%{?_isa}
 Requires: pkgconfig(gl)
 %description devel
+%{summary}.
+
+%package doc
+Summary: API documentation for %{name}
+Requires: %{name} = %{version}-%{release}
+BuildArch: noarch
+%description doc
 %{summary}.
 
 %package static 
@@ -242,10 +251,14 @@ popd
 
 make %{?_smp_mflags}
 
+make %{?_smp_mflags} docs
+
 
 %install
 
 make install INSTALL_ROOT=%{buildroot}
+
+make install_docs INSTALL_ROOT=%{buildroot}
 
 # Qt5.pc
 cat >%{buildroot}%{_libdir}/pkgconfig/Qt5.pc<<EOF
@@ -346,7 +359,6 @@ popd
 
 
 ## work-in-progress, doesn't work yet -- rex
-%if 0
 %check
 export CMAKE_PREFIX_PATH=%{buildroot}%{_prefix}
 export CTEST_OUTPUT_ON_FAILURE=1
@@ -354,10 +366,9 @@ export PATH=%{buildroot}%{_bindir}:$PATH
 export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 mkdir tests/auto/cmake/%{_target_platform}
 pushd tests/auto/cmake/%{_target_platform}
-cmake ..
-ctest --output-on-failure
+cmake .. ||:
+ctest --output-on-failure ||:
 popd
-%endif
 
 
 %post -p /sbin/ldconfig
@@ -377,7 +388,7 @@ popd
 %{_qt5_libdir}/libQt5Sql.so.5*
 %{_qt5_libdir}/libQt5Test.so.5*
 %{_qt5_libdir}/libQt5Xml.so.5*
-%{_qt5_docdir}/
+%dir %{_qt5_docdir}/
 %{_qt5_importdir}/
 %{_qt5_translationdir}/
 %dir %{_qt5_prefix}/
@@ -400,6 +411,23 @@ popd
 %dir %{_qt5_plugindir}/printsupport/
 %dir %{_qt5_plugindir}/sqldrivers/
 %{_qt5_plugindir}/sqldrivers/libqsqlite.so
+
+%files doc
+%{_qt5_docdir}/*.qch
+%{_qt5_docdir}/global/
+%{_qt5_docdir}/qdoc/
+%{_qt5_docdir}/qmake/
+%{_qt5_docdir}/qtconcurrent/
+%{_qt5_docdir}/qtcore/
+%{_qt5_docdir}/qtdbus/
+%{_qt5_docdir}/qtgui/
+%{_qt5_docdir}/qtnetwork/
+%{_qt5_docdir}/qtopengl/
+%{_qt5_docdir}/qtprintsupport/
+%{_qt5_docdir}/qtsql/
+%{_qt5_docdir}/qttestlib/
+%{_qt5_docdir}/qtwidgets/
+%{_qt5_docdir}/qtxml/
 
 %files devel
 %{rpm_macros_dir}/macros.qt5
@@ -539,6 +567,10 @@ popd
 
 
 %changelog
+* Fri Sep 27 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.1.1-6
+- -doc subpkg
+- enable %%check
+
 * Mon Sep 23 2013 Dan Horák <dan[at]danny.cz> - 5.1.1-5
 - fix big endian builds
 
