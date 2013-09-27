@@ -12,6 +12,9 @@
 %define rpm_macros_dir %{_sysconfdir}/rpm
 %endif
 
+# define to build docs (currently broken)
+#define docs 1
+
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.1.1
@@ -251,14 +254,18 @@ popd
 
 make %{?_smp_mflags}
 
-make %{?_smp_mflags} docs
+%if 0%{?docs}
+make docs
+%endif
 
 
 %install
 
 make install INSTALL_ROOT=%{buildroot}
 
+%if 0%{?docs}
 make install_docs INSTALL_ROOT=%{buildroot}
+%endif
 
 # Qt5.pc
 cat >%{buildroot}%{_libdir}/pkgconfig/Qt5.pc<<EOF
@@ -412,6 +419,7 @@ popd
 %dir %{_qt5_plugindir}/sqldrivers/
 %{_qt5_plugindir}/sqldrivers/libqsqlite.so
 
+%if 0%{?docs}
 %files doc
 %{_qt5_docdir}/*.qch
 %{_qt5_docdir}/global/
@@ -428,6 +436,7 @@ popd
 %{_qt5_docdir}/qttestlib/
 %{_qt5_docdir}/qtwidgets/
 %{_qt5_docdir}/qtxml/
+%endif
 
 %files devel
 %{rpm_macros_dir}/macros.qt5
@@ -568,7 +577,7 @@ popd
 
 %changelog
 * Fri Sep 27 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.1.1-6
-- -doc subpkg
+- -doc subpkg (not enabled, needswork)
 - enable %%check
 
 * Mon Sep 23 2013 Dan Horák <dan[at]danny.cz> - 5.1.1-5
