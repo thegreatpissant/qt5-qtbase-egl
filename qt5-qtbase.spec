@@ -14,7 +14,8 @@
 
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
-%define docs 1
+# FIXME: noarch -doc content different between archs
+#define docs 1
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
@@ -583,7 +584,7 @@ popd
 
 %changelog
 * Fri Sep 27 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.1.1-6
-- -doc subpkg
+- -doc subpkg (not enabled)
 - enable %%check
 
 * Mon Sep 23 2013 Dan Horák <dan[at]danny.cz> - 5.1.1-5
