@@ -21,7 +21,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 0.1.%{pre}%{?dist}
+Release: 0.2.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -33,13 +33,16 @@ Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/subm
 %endif
 
 # http://bugzilla.redhat.com/1005482
-ExcludeArch: ppc64 ppc
+#ExcludeArch: ppc64 ppc
 
 # help build on some lowmem archs, e.g. drop hard-coded -O3 optimization on some files
 Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
+
+# qatomic on ppc/ppc64
+Patch3: qtbase-qatomic-ppc.patch
 
 # upstreamable patches
 # support poll
@@ -194,6 +197,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
+
+%patch3 -p1 -b .qatomic-ppc
 
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .bigendian
@@ -593,6 +598,9 @@ popd
 
 
 %changelog
+* Wed Oct 16 2013 Lukáš Tinkl <ltinkl@redhat.com> - 5.2.0-0.2.alpha
+- Fixes #1005482 - qtbase FTBFS on ppc/ppc64
+
 * Tue Oct 01 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.2.0-0.1.alpha
 - 5.2.0-alpha
 - -system-harfbuzz
