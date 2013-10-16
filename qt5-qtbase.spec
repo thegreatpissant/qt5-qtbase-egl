@@ -14,14 +14,14 @@
 
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
-%define docs 1
+#define docs 1
 
 %define pre alpha
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 0.2.%{pre}%{?dist}
+Release: 0.3.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -32,16 +32,13 @@ Source0: http://download.qt-project.org/development_releases/qt/5.2/%{version}-%
 Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 %endif
 
-# http://bugzilla.redhat.com/1005482
-#ExcludeArch: ppc64 ppc
-
 # help build on some lowmem archs, e.g. drop hard-coded -O3 optimization on some files
 Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
 
-# qatomic on ppc/ppc64
+# qatomic on ppc/ppc64, http://bugzilla.redhat.com/1005482
 Patch3: qtbase-qatomic-ppc.patch
 
 # upstreamable patches
@@ -598,6 +595,9 @@ popd
 
 
 %changelog
+* Wed Oct 16 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.3.alpha
+- disable -docs (for ppc bootstrap mostly)
+
 * Wed Oct 16 2013 Lukáš Tinkl <ltinkl@redhat.com> - 5.2.0-0.2.alpha
 - Fixes #1005482 - qtbase FTBFS on ppc/ppc64
 
