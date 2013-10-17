@@ -15,7 +15,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.1.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -30,6 +30,9 @@ Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
+
+# qatomic on ppc/ppc64, http://bugzilla.redhat.com/1005482
+Patch3: qtbase-qatomic-ppc.patch
 
 # upstreamable patches
 # support poll
@@ -165,6 +168,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
+
+%patch3 -p1 -b .qatomic-ppc
 
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .bigendian
@@ -539,6 +544,9 @@ popd
 
 
 %changelog
+* Thu Oct 17 2013 Lukáš Tinkl <ltinkl@redhat.com> - 5.1.1-6
+- Fixes #1005482 - qtbase FTBFS on ppc/ppc64
+
 * Mon Sep 23 2013 Dan Horák <dan[at]danny.cz> - 5.1.1-5
 - fix big endian builds
 
