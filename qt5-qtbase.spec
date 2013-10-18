@@ -97,8 +97,10 @@ BuildRequires: pkgconfig(openssl)
 %if 0%{?fedora} || 0%{?rhel} > 6
 BuildRequires: pkgconfig(atspi-2)
 BuildRequires: pkgconfig(glesv2)
-BuildRequires: pkgconfig(harfbuzz)
+%if 0%{?fedora} > 18
+BuildRequires: pkgconfig(harfbuzz) >= 0.9.19
 %define harfbuzz -system-harfbuzz
+%endif
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
