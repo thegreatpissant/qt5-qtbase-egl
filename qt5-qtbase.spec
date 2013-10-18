@@ -12,24 +12,34 @@
 %define rpm_macros_dir %{_sysconfdir}/rpm
 %endif
 
+# define to build docs, need to undef this for bootstrapping
+# where qt5-qttools builds are not yet available
+#define docs 1
+
+%define pre alpha
+
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.1.1
-Release: 5%{?dist}
+Version: 5.2.0
+Release: 0.3.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://download.qt-project.org/official_releases/qt/5.1/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
-
-# http://bugzilla.redhat.com/1005482
-ExcludeArch: ppc64 ppc
+%if 0%{?pre:1}
+Source0: http://download.qt-project.org/development_releases/qt/5.2/%{version}-%{pre}/submodules/%{qt_module}-opensource-src-%{version}-%{pre}.tar.xz
+%else
+Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+%endif
 
 # help build on some lowmem archs, e.g. drop hard-coded -O3 optimization on some files
 Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
+
+# qatomic on ppc/ppc64, http://bugzilla.redhat.com/1005482
+Patch3: qtbase-qatomic-ppc.patch
 
 # upstreamable patches
 # support poll
@@ -38,6 +48,8 @@ Patch2: qtbase-multilib_optflags.patch
 Patch50: qt5-poll.patch
 # fix big endian builds
 Patch51: qtbase-opensource-src-5.1.1-bigendian.patch
+# fix build with -system-harfbuzz
+Patch52: qtbase-opensource-src-5.2.0-alpha-harfbuzz.patch
 
 ##upstream patches
 
@@ -62,6 +74,8 @@ Patch51: qtbase-opensource-src-5.1.1-bigendian.patch
 %define _qt5_sysconfdir %{_qt5_settingsdir} 
 %define _qt5_translationdir %{_datadir}/qt5/translations
 
+# for %%check
+BuildRequires: cmake
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: findutils
@@ -83,6 +97,8 @@ BuildRequires: pkgconfig(openssl)
 %if 0%{?fedora} || 0%{?rhel} > 6
 BuildRequires: pkgconfig(atspi-2)
 BuildRequires: pkgconfig(glesv2)
+BuildRequires: pkgconfig(harfbuzz)
+%define harfbuzz -system-harfbuzz
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
@@ -107,10 +123,21 @@ handling.
 %package devel
 Summary: Development files for %{name} 
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: %{name}-x11%{?_isa}
+Requires: %{name}-gui%{?_isa}
 Requires: pkgconfig(gl)
 %description devel
 %{summary}.
+
+%if 0%{?docs}
+%package doc
+Summary: API documentation for %{name}
+Requires: %{name} = %{version}-%{release}
+# for qhelpgenerator
+BuildRequires: qt5-qttools-devel
+BuildArch: noarch
+%description doc
+%{summary}.
+%endif
 
 %package static 
 Summary: Static library files for %{name}
@@ -152,22 +179,27 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %{summary}.
 
 # debating whether to do 1 subpkg per library or not -- rex
-%package x11
+%package gui
 Summary: Qt5 GUI-related libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
-%description x11
+Obsoletes: qt5-qtbase-x11 < 5.2.0
+Provides:  qt5-qtbase-x11 = %{version}-%{release}
+%description gui
 Qt5 libraries used for drawing widgets and OpenGL items.
 
 
 %prep
-%setup -q -n qtbase-opensource-src-%{version}
+%setup -q -n qtbase-opensource-src-%{version}%{?pre:-%{pre}}
 
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
+%patch3 -p1 -b .qatomic-ppc
+
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .bigendian
+%patch52 -p1 -b .harfbuzz
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -234,6 +266,7 @@ popd
   -no-separate-debug-info \
   -no-strip \
   -reduce-relocations \
+  %{?harfbuzz} \
   -system-libjpeg \
   -system-libpng \
   %{?pcre} \
@@ -242,10 +275,19 @@ popd
 
 make %{?_smp_mflags}
 
+%if 0%{?docs}
+# wierd but necessary, to force regeration to use just-built qdoc
+rm -fv src/corelib/Makefile
+make %{?_smp_mflags} docs
+%endif
+
 
 %install
-
 make install INSTALL_ROOT=%{buildroot}
+
+%if 0%{?docs}
+make install_docs INSTALL_ROOT=%{buildroot}
+%endif
 
 # Qt5.pc
 cat >%{buildroot}%{_libdir}/pkgconfig/Qt5.pc<<EOF
@@ -299,19 +341,17 @@ EOF
 # create/own dirs
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/iconengines,%{_qt5_translationdir}}
 
-# put non-conflicting binaries with -qt5 postfix in %{_bindir} 
+# hardlink files to %{_bindir}, add -qt5 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
 pushd %{buildroot}%{_qt5_bindir}
 for i in * ; do
   case "${i}" in
     moc|qdbuscpp2xml|qdbusxml2cpp|qmake|rcc|syncqt|uic)
-      mv $i ../../../bin/${i}-qt5
-      ln -s ../../../bin/${i}-qt5 .
-      ln -s ../../../bin/${i}-qt5 $i
+      ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt5
+      ln -sv ${i} ${i}-qt5
       ;;
-   *)
-      mv $i ../../../bin/
-      ln -s ../../../bin/$i .
+    *)
+      ln -v  ${i} %{buildroot}%{_bindir}/${i}
       ;;
   esac
 done
@@ -326,7 +366,7 @@ popd
   %ifarch %{multilib_archs}
     mv qt5.conf qt5-%{__isa_bits}.conf
     %ifarch %{multilib_basearchs}
-      ln -sf qt5-%{__isa_bits}.conf qt5.conf
+      ln -sv qt5-%{__isa_bits}.conf qt5.conf
     %endif
   %endif
   popd
@@ -346,7 +386,6 @@ popd
 
 
 ## work-in-progress, doesn't work yet -- rex
-%if 0
 %check
 export CMAKE_PREFIX_PATH=%{buildroot}%{_prefix}
 export CTEST_OUTPUT_ON_FAILURE=1
@@ -354,10 +393,9 @@ export PATH=%{buildroot}%{_bindir}:$PATH
 export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 mkdir tests/auto/cmake/%{_target_platform}
 pushd tests/auto/cmake/%{_target_platform}
-cmake ..
-ctest --output-on-failure
+cmake .. ||:
+ctest --output-on-failure ||:
 popd
-%endif
 
 
 %post -p /sbin/ldconfig
@@ -377,7 +415,8 @@ popd
 %{_qt5_libdir}/libQt5Sql.so.5*
 %{_qt5_libdir}/libQt5Test.so.5*
 %{_qt5_libdir}/libQt5Xml.so.5*
-%{_qt5_docdir}/
+%dir %{_qt5_docdir}/
+%{_qt5_docdir}/global/
 %{_qt5_importdir}/
 %{_qt5_translationdir}/
 %dir %{_qt5_prefix}/
@@ -392,14 +431,29 @@ popd
 %dir %{_qt5_plugindir}/generic/
 %dir %{_qt5_plugindir}/imageformats/
 %dir %{_qt5_plugindir}/platforminputcontexts/
-%{_qt5_plugindir}/platforminputcontexts/libcomposeplatforminputcontextplugin.so
 %dir %{_qt5_plugindir}/platforms/
-%{_qt5_plugindir}/platforms/libqoffscreen.so
 %dir %{_qt5_plugindir}/platformthemes/
-%{_qt5_plugindir}/platformthemes/libqgtk2.so
 %dir %{_qt5_plugindir}/printsupport/
 %dir %{_qt5_plugindir}/sqldrivers/
 %{_qt5_plugindir}/sqldrivers/libqsqlite.so
+
+%if 0%{?docs}
+%files doc
+%{_qt5_docdir}/*.qch
+%{_qt5_docdir}/qdoc/
+%{_qt5_docdir}/qmake/
+%{_qt5_docdir}/qtconcurrent/
+%{_qt5_docdir}/qtcore/
+%{_qt5_docdir}/qtdbus/
+%{_qt5_docdir}/qtgui/
+%{_qt5_docdir}/qtnetwork/
+%{_qt5_docdir}/qtopengl/
+%{_qt5_docdir}/qtprintsupport/
+%{_qt5_docdir}/qtsql/
+%{_qt5_docdir}/qttestlib/
+%{_qt5_docdir}/qtwidgets/
+%{_qt5_docdir}/qtxml/
+%endif
 
 %files devel
 %{rpm_macros_dir}/macros.qt5
@@ -514,10 +568,10 @@ popd
 %files tds
 %{_qt5_plugindir}/sqldrivers/libqsqltds.so
 
-%post x11 -p /sbin/ldconfig
-%postun x11 -p /sbin/ldconfig
+%post gui -p /sbin/ldconfig
+%postun gui -p /sbin/ldconfig
 
-%files x11
+%files gui
 %{_qt5_libdir}/libQt5Gui.so.5*
 %{_qt5_libdir}/libQt5OpenGL.so.5*
 %{_qt5_libdir}/libQt5PrintSupport.so.5*
@@ -530,15 +584,34 @@ popd
 %{_qt5_plugindir}/imageformats/libqgif.so
 %{_qt5_plugindir}/imageformats/libqico.so
 %{_qt5_plugindir}/imageformats/libqjpeg.so
+%{_qt5_plugindir}/platforminputcontexts/libcomposeplatforminputcontextplugin.so
 %{_qt5_plugindir}/platforminputcontexts/libibusplatforminputcontextplugin.so
-%{_qt5_plugindir}/platforminputcontexts/libmaliitplatforminputcontextplugin.so
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
+%{_qt5_plugindir}/platforms/libqoffscreen.so
 %{_qt5_plugindir}/platforms/libqxcb.so
+%{_qt5_plugindir}/platformthemes/libqgtk2.so
 %{_qt5_plugindir}/printsupport/libcupsprintersupport.so
 
 
 %changelog
+* Wed Oct 16 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.3.alpha
+- disable -docs (for ppc bootstrap mostly)
+
+* Wed Oct 16 2013 Lukáš Tinkl <ltinkl@redhat.com> - 5.2.0-0.2.alpha
+- Fixes #1005482 - qtbase FTBFS on ppc/ppc64
+
+* Tue Oct 01 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.2.0-0.1.alpha
+- 5.2.0-alpha
+- -system-harfbuzz
+- rename subpkg -x11 => -gui
+- move some gui-related plugins base => -gui
+- don't use symlinks in %%_qt5_bindir (more qtchooser-friendly)
+
+* Fri Sep 27 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.1.1-6
+- -doc subpkg (not enabled)
+- enable %%check
+
 * Mon Sep 23 2013 Dan Horák <dan[at]danny.cz> - 5.1.1-5
 - fix big endian builds
 
