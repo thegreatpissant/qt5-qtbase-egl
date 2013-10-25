@@ -597,8 +597,8 @@ popd
 
 
 %changelog
-* Thu Oct 24 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.4.beta
-- 5.2.0-beta
+* Thu Oct 24 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.4.beta1
+- 5.2.0-beta1
 
 * Wed Oct 16 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.3.alpha
 - disable -docs (for ppc bootstrap mostly)
