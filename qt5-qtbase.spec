@@ -14,14 +14,14 @@
 
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
-#define docs 1
+%define docs 1
 
-%define pre alpha
+%define pre beta1
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 0.3.%{pre}%{?dist}
+Release: 0.4.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -597,6 +597,9 @@ popd
 
 
 %changelog
+* Thu Oct 24 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.4.beta
+- 5.2.0-beta
+
 * Wed Oct 16 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.3.alpha
 - disable -docs (for ppc bootstrap mostly)
 
