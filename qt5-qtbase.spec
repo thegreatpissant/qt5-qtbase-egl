@@ -17,19 +17,25 @@
 %define docs 1
 
 %define pre beta1
+%define snap 2013-11-08_141
+%define snap_tag 20131108_141
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 0.4.%{pre}%{?dist}
+Release: 0.5.%{pre}.%{snap_tag}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
+%if 0%{?snap:1}
+Source0: http://download.qt-project.org/snapshots/qt/5.2/%{version}-%{pre}/%{snap}/submodules/%{qt_module}-opensource-src-%{version}-%{pre}.tar.xz
+%else
 %if 0%{?pre:1}
 Source0: http://download.qt-project.org/development_releases/qt/5.2/%{version}-%{pre}/submodules/%{qt_module}-opensource-src-%{version}-%{pre}.tar.xz
 %else
 Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+%endif
 %endif
 
 # help build on some lowmem archs, e.g. drop hard-coded -O3 optimization on some files
@@ -597,6 +603,9 @@ popd
 
 
 %changelog
+* Sat Nov 09 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.5.beta1.20131108_141
+- 2013-11-08_141 snapshot, arm switch qreal double
+
 * Thu Oct 24 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.4.beta1
 - 5.2.0-beta1
 
