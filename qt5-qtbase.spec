@@ -23,7 +23,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 0.5.%{pre}.%{snap_tag}%{?dist}
+Release: 0.6.%{pre}.%{snap_tag}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -58,6 +58,8 @@ Patch51: qtbase-opensource-src-5.1.1-bigendian.patch
 Patch52: qtbase-opensource-src-5.2.0-alpha-harfbuzz.patch
 
 ##upstream patches
+# fix egl build
+Patch53: qtbase-opensource-src-5.2.0-egl.patch
 
 # macros
 %define _qt5 %{name}
@@ -208,6 +210,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .bigendian
 %patch52 -p1 -b .harfbuzz
+%patch53 -p1 -b .egl
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -603,6 +606,9 @@ popd
 
 
 %changelog
+* Fri Nov 22 2013 Lubomir Rintel <lkundrak@v3.sk> 5.2.0-0.6.beta1.20131108_141
+- Enable EGL support
+
 * Sat Nov 09 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.5.beta1.20131108_141
 - 2013-11-08_141 snapshot, arm switch qreal double
 
