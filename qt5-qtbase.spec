@@ -282,7 +282,8 @@ popd
   -system-libpng \
   %{?pcre} \
   -system-sqlite \
-  -system-zlib
+  -system-zlib \
+  -no-eglfs
 
 make %{?_smp_mflags}
 
