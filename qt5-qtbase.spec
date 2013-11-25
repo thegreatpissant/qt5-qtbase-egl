@@ -14,7 +14,10 @@
 
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
+# only primary archs (for now), allow secondary to bootstrap
+%ifarch %{arm} %{ix86} x86_64
 %define docs 1
+%endif
 
 %define pre beta1
 %define snap 2013-11-08_141
@@ -23,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 0.6.%{pre}.%{snap_tag}%{?dist}
+Release: 0.7.%{pre}.%{snap_tag}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -607,6 +610,9 @@ popd
 
 
 %changelog
+* Mon Nov 25 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.7.beta1.20131108_141
+- enable -doc only on primary archs (allow secondary bootstrap)
+
 * Fri Nov 22 2013 Lubomir Rintel <lkundrak@v3.sk> 5.2.0-0.6.beta1.20131108_141
 - Enable EGL support
 
