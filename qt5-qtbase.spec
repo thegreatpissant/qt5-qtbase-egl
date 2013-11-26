@@ -26,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 0.7.%{pre}.%{snap_tag}%{?dist}
+Release: 0.8.%{pre}.%{snap_tag}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -418,6 +418,7 @@ popd
 
 %files 
 %doc LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt
+%doc dist/README dist/changes-%{version}
 %if 0%{?qtchooser}
 # not editable config files, so not using %%config here
 %dir %{_sysconfdir}/xdg/qtchooser
@@ -610,6 +611,9 @@ popd
 
 
 %changelog
+* Tue Nov 26 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.8.beta1.20131108_141
+- Install changes-5.x.y file (#989149)
+
 * Mon Nov 25 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.7.beta1.20131108_141
 - enable -doc only on primary archs (allow secondary bootstrap)
 
