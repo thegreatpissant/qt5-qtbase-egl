@@ -140,16 +140,16 @@ Requires: pkgconfig(gl)
 %description devel
 %{summary}.
 
+%if 0%{?docs}
 %package doc
 Summary: API documentation for %{name}
 Requires: %{name} = %{version}-%{release}
-%if 0%{?docs}
 # for qhelpgenerator
 BuildRequires: qt5-qttools-devel
-%endif
 BuildArch: noarch
 %description doc
 %{summary}.
+%endif
 
 %package static 
 Summary: Static library files for %{name}
@@ -452,9 +452,9 @@ popd
 %dir %{_qt5_plugindir}/sqldrivers/
 %{_qt5_plugindir}/sqldrivers/libqsqlite.so
 
+%if 0%{?docs}
 %files doc
 %doc dist/README dist/changes-5.*
-%if 0%{?docs}
 %{_qt5_docdir}/*.qch
 %{_qt5_docdir}/qdoc/
 %{_qt5_docdir}/qmake/
