@@ -26,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 0.10.%{pre}%{?dist}
+Release: 0.11.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -106,6 +106,8 @@ BuildRequires: pkgconfig(openssl)
 %if 0%{?fedora} || 0%{?rhel} > 6
 BuildRequires: pkgconfig(atspi-2)
 BuildRequires: pkgconfig(glesv2)
+BuildRequires: pkgconfig(sqlite3) >= 3.7
+%define sqlite -system-sqlite
 %if 0%{?fedora} > 18
 BuildRequires: pkgconfig(harfbuzz) >= 0.9.19
 %define harfbuzz -system-harfbuzz
@@ -119,7 +121,6 @@ BuildRequires: pkgconfig(xkbcommon)
 BuildRequires: libicu-devel
 %define pcre -qt-pcre
 %endif
-BuildRequires: pkgconfig(sqlite3) 
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
 BuildRequires: postgresql-devel
@@ -139,16 +140,16 @@ Requires: pkgconfig(gl)
 %description devel
 %{summary}.
 
-%if 0%{?docs}
 %package doc
 Summary: API documentation for %{name}
 Requires: %{name} = %{version}-%{release}
+%if 0%{?docs}
 # for qhelpgenerator
 BuildRequires: qt5-qttools-devel
+%endif
 BuildArch: noarch
 %description doc
 %{summary}.
-%endif
 
 %package static 
 Summary: Static library files for %{name}
@@ -236,7 +237,10 @@ sed -i -e "s|^\(QMAKE_LFLAGS_RELEASE.*\)|\1 $RPM_LD_FLAGS|" \
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
-mv freetype libjpeg libpng sqlite zlib xcb UNUSED/
+mv freetype libjpeg libpng zlib xcb UNUSED/
+%if "%{?sqlite}" == "-system-sqlite"
+mv sqlite UNUSED/
+%endif
 popd
 
 
@@ -281,7 +285,7 @@ popd
   -system-libjpeg \
   -system-libpng \
   %{?pcre} \
-  -system-sqlite \
+  %{?sqlite} \
   -system-zlib
 
 make %{?_smp_mflags}
@@ -607,6 +611,10 @@ popd
 
 
 %changelog
+* Thu Dec 05 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.2.0-0.11.rc1
+- needs a minimum version on sqlite build dependency (#1038617)
+- fix build when doc macro not defined
+
 * Mon Dec 02 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.10.rc1
 - 5.2.0-rc1
 - revert/omit recent egl packaging changes
