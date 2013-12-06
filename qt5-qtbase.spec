@@ -26,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 0.11.%{pre}%{?dist}
+Release: 0.12.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -40,6 +40,10 @@ Source0: http://download.qt-project.org/development_releases/qt/5.2/%{version}-%
 Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 %endif
 %endif
+
+# header file to workaround multilib issue
+# https://bugzilla.redhat.com/show_bug.cgi?id=1036956
+Source5: qconfig-multilib.h
 
 # help build on some lowmem archs, e.g. drop hard-coded -O3 optimization on some files
 Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
@@ -372,6 +376,14 @@ for i in * ; do
 done
 popd
 
+%ifarch %{multilib_archs}
+# multilib: qconfig.h
+  mv %{buildroot}%{_qt5_headerdir}/Qt/qconfig.h %{buildroot}%{_qt5_headerdir}/QtCore/qconfig-%{__isa_bits}.h
+  install -p -m644 -D %{SOURCE5} %{buildroot}%{_qt5_headerdir}/QtCore/qconfig-multilib.h
+  ln -sf qconfig-multilib.h %{buildroot}%{_qt5_headerdir}/QtCore/qconfig.h
+  ln -sf ../QtCore/qconfig.h %{buildroot}%{_qt5_headerdir}/Qt/qconfig.h
+%endif
+
 # qtchooser conf
 %if 0%{?qtchooser}
   mkdir -p %{buildroot}%{_sysconfdir}/xdg/qtchooser
@@ -611,6 +623,9 @@ popd
 
 
 %changelog
+* Fri Dec 06 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.12.rc1
+- qt5-base-devel.x86_64 qt5-base-devel.i686 file conflict qconfig.h (#1036956)
+
 * Thu Dec 05 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.2.0-0.11.rc1
 - needs a minimum version on sqlite build dependency (#1038617)
 - fix build when doc macro not defined
