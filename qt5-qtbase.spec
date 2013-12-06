@@ -378,10 +378,8 @@ popd
 
 %ifarch %{multilib_archs}
 # multilib: qconfig.h
-  mv %{buildroot}%{_qt5_headerdir}/Qt/qconfig.h %{buildroot}%{_qt5_headerdir}/QtCore/qconfig-%{__isa_bits}.h
-  install -p -m644 -D %{SOURCE5} %{buildroot}%{_qt5_headerdir}/QtCore/qconfig-multilib.h
-  ln -sf qconfig-multilib.h %{buildroot}%{_qt5_headerdir}/QtCore/qconfig.h
-  ln -sf ../QtCore/qconfig.h %{buildroot}%{_qt5_headerdir}/Qt/qconfig.h
+  mv %{buildroot}%{_qt5_headerdir}/QtCore/qconfig.h %{buildroot}%{_qt5_headerdir}/QtCore/qconfig-%{__isa_bits}.h
+  install -p -m644 -D %{SOURCE5} %{buildroot}%{_qt5_headerdir}/QtCore/qconfig.h
 %endif
 
 # qtchooser conf
