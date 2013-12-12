@@ -19,14 +19,14 @@
 %define docs 1
 %endif
 
-%define pre rc1
+#define pre rc1
 #define snap 2013-11-08_141
 #define snap_tag 20131108_141
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 0.12.%{pre}%{?dist}
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -621,6 +621,9 @@ popd
 
 
 %changelog
+* Thu Dec 12 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-1
+- 5.2.0
+
 * Fri Dec 06 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.12.rc1
 - qt5-base-devel.x86_64 qt5-base-devel.i686 file conflict qconfig.h (#1036956)
 
