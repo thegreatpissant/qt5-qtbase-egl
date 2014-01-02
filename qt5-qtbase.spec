@@ -145,7 +145,7 @@ Requires: %{name}-ibase%{?_isa}
 Requires: %{name}-mysql%{?_isa}
 Requires: %{name}-odbc%{?_isa}
 Requires: %{name}-postgresql%{?_isa}
-Requires  %{name}-tds%{?_isa}
+Requires:  %{name}-tds%{?_isa}
 Requires: pkgconfig(gl)
 %description devel
 %{summary}.
