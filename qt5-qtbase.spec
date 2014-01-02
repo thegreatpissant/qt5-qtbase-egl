@@ -26,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -140,6 +140,12 @@ handling.
 Summary: Development files for %{name} 
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-gui%{?_isa}
+# qtsql apparently wants all drivers available at buildtime
+Requires: %{name}-ibase%{?_isa}
+Requires: %{name}-mysql%{?_isa}
+Requires: %{name}-odbc%{?_isa}
+Requires: %{name}-postgresql%{?_isa}
+Requires  %{name}-tds%{?_isa}
 Requires: pkgconfig(gl)
 %description devel
 %{summary}.
@@ -621,6 +627,9 @@ popd
 
 
 %changelog
+* Thu Jan 02 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-2
+- -devel: qtsql apparently wants all drivers available at buildtime
+
 * Thu Dec 12 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-1
 - 5.2.0
 
