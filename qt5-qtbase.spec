@@ -15,7 +15,7 @@
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
-%if 0%{?rhel} && 0%{?rhel} < 7
+%if !0%{?rhel} || 0%{?rhel} < 7
 %ifarch %{arm} %{ix86} x86_64
 %define docs 1
 %endif
@@ -662,6 +662,7 @@ popd
 * Mon Jan 13 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.2.0-4
 - fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
 - fix QTBUG-35460 (error message for CVE-2013-4549 is misspelled)
+- reenable docs on Fedora (accidentally disabled)
 
 * Mon Jan 13 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.2.0-3
 - move sql build deps into subpkg sections
