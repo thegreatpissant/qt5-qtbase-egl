@@ -104,6 +104,9 @@ BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
 BuildRequires: pkgconfig(NetworkManager)
 BuildRequires: pkgconfig(openssl)
+%if 0%{?fedora}
+BuildRequires: pkgconfig(xkbcommon)
+%endif
 %if 0%{?fedora} || 0%{?rhel} > 6
 BuildRequires: pkgconfig(atspi-2)
 BuildRequires: pkgconfig(glesv2)
@@ -117,7 +120,6 @@ BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
 BuildRequires: pkgconfig(xcb-xkb)
-BuildRequires: pkgconfig(xkbcommon)
 %else
 BuildRequires: libicu-devel
 %define pcre -qt-pcre
