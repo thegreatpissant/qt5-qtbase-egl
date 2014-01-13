@@ -26,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -92,12 +92,9 @@ BuildRequires: cmake
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: findutils
-BuildRequires: firebird-devel
-BuildRequires: freetds-devel
 BuildRequires: libjpeg-devel
 BuildRequires: libmng-devel
 BuildRequires: libtiff-devel
-BuildRequires: mysql-devel
 BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
@@ -127,8 +124,12 @@ BuildRequires: libicu-devel
 %endif
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
-BuildRequires: postgresql-devel
-BuildRequires: unixODBC-devel
+
+## Sql drivers
+%if 0%{?rhel}
+%define ibase -no-sql-ibase
+%define tds -no-sql-tds
+%endif
 
 %description 
 Qt is a software toolkit for developing applications.
@@ -141,11 +142,15 @@ Summary: Development files for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-gui%{?_isa}
 # qtsql apparently wants all drivers available at buildtime
+%if "%{?ibase}" != "-no-sql-ibase"
 Requires: %{name}-ibase%{?_isa}
+%endif
 Requires: %{name}-mysql%{?_isa}
 Requires: %{name}-odbc%{?_isa}
 Requires: %{name}-postgresql%{?_isa}
-Requires:  %{name}-tds%{?_isa}
+%if "%{?tds}" != "-no-sql-tds"
+Requires: %{name}-tds%{?_isa}
+%endif
 Requires: pkgconfig(gl)
 %description devel
 %{summary}.
@@ -170,35 +175,44 @@ Requires: pkgconfig(zlib)
 %description static 
 %{summary}.
 
+%if "%{?ibase}" != "-no-sql-ibase"
 %package ibase
 Summary: IBase driver for Qt5's SQL classes
+BuildRequires: firebird-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %description ibase
 %{summary}.
+%endif
 
 %package mysql
 Summary: MySQL driver for Qt5's SQL classes
+BuildRequires: mysql-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %description mysql 
 %{summary}.
 
 %package odbc 
 Summary: ODBC driver for Qt5's SQL classes
+BuildRequires: unixODBC-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %description odbc 
 %{summary}.
 
 %package postgresql 
 Summary: PostgreSQL driver for Qt5's SQL classes
+BuildRequires: postgresql-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %description postgresql 
 %{summary}.
 
+%if "%{?tds}" != "-no-sql-tds"
 %package tds
 Summary: TDS driver for Qt5's SQL classes
+BuildRequires: freetds-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %description tds
 %{summary}.
+%endif
 
 # debating whether to do 1 subpkg per library or not -- rex
 %package gui
@@ -280,6 +294,7 @@ popd
   -fontconfig \
   -glib \
   -gtkstyle \
+  %{?ibase} \
   -iconv \
   -icu \
   -openssl-linked \
@@ -296,6 +311,7 @@ popd
   -system-libpng \
   %{?pcre} \
   %{?sqlite} \
+  %{?tds} \
   -system-zlib
 
 make %{?_smp_mflags}
@@ -585,8 +601,10 @@ popd
 %{_qt5_libdir}/libQt5PlatformSupport.prl
 %{_qt5_libdir}/pkgconfig/Qt5PlatformSupport.pc
 
+%if "%{?ibase}" != "-no-sql-ibase"
 %files ibase
 %{_qt5_plugindir}/sqldrivers/libqsqlibase.so
+%endif
 
 %files mysql
 %{_qt5_plugindir}/sqldrivers/libqsqlmysql.so
@@ -597,8 +615,10 @@ popd
 %files postgresql 
 %{_qt5_plugindir}/sqldrivers/libqsqlpsql.so
 
+%if "%{?tds}" != "-no-sql-tds"
 %files tds
 %{_qt5_plugindir}/sqldrivers/libqsqltds.so
+%endif
 
 %post gui -p /sbin/ldconfig
 %postun gui -p /sbin/ldconfig
@@ -627,6 +647,10 @@ popd
 
 
 %changelog
+* Mon Jan 13 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.2.0-3
+- move sql build deps into subpkg sections
+- macro'ize ibase,tds support (disabled on rhel)
+
 * Thu Jan 02 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-2
 - -devel: qtsql apparently wants all drivers available at buildtime
 
