@@ -28,7 +28,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -55,6 +55,12 @@ Patch2: qtbase-multilib_optflags.patch
 
 # qatomic on ppc/ppc64, http://bugzilla.redhat.com/1005482
 Patch3: qtbase-qatomic-ppc.patch
+
+# fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
+Patch4: qt-everywhere-opensource-src-4.8.5-QTBUG-35459.patch
+
+# fix QTBUG-35460 (error message for CVE-2013-4549 is misspelled)
+Patch5: qt-everywhere-opensource-src-4.8.5-QTBUG-35460.patch
 
 # upstreamable patches
 # support poll
@@ -236,6 +242,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 %patch3 -p1 -b .qatomic-ppc
+%patch4 -p1 -b .QTBUG-35459
+%patch5 -p1 -b .QTBUG-35460
 
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .bigendian
@@ -651,6 +659,10 @@ popd
 
 
 %changelog
+* Mon Jan 13 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.2.0-4
+- fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
+- fix QTBUG-35460 (error message for CVE-2013-4549 is misspelled)
+
 * Mon Jan 13 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.2.0-3
 - move sql build deps into subpkg sections
 - macro'ize ibase,tds support (disabled on rhel)
