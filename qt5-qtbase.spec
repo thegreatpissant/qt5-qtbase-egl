@@ -114,10 +114,10 @@ BuildRequires: pkgconfig(atspi-2)
 BuildRequires: pkgconfig(glesv2)
 BuildRequires: pkgconfig(sqlite3) >= 3.7
 %define sqlite -system-sqlite
-%if 0%{?fedora} > 18
+#if 0%{?fedora} > 18
 BuildRequires: pkgconfig(harfbuzz) >= 0.9.19
 %define harfbuzz -system-harfbuzz
-%endif
+#endif
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
