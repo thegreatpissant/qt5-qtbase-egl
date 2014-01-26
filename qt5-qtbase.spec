@@ -26,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -174,6 +174,12 @@ BuildArch: noarch
 %{summary}.
 %endif
 
+%package examples
+Summary: Programming examples for %{name}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+%description examples
+%{summary}.
+
 %package static 
 Summary: Static library files for %{name}
 Requires: %{name}-devel%{?_isa} = %{version}-%{release}
@@ -309,7 +315,6 @@ popd
   -icu \
   -openssl-linked \
   -optimized-qmake \
-  -nomake examples \
   -nomake tests \
   -no-pch \
   -no-rpath \
@@ -611,6 +616,9 @@ popd
 %{_qt5_libdir}/libQt5PlatformSupport.prl
 %{_qt5_libdir}/pkgconfig/Qt5PlatformSupport.pc
 
+%files examples
+%{_qt5_examplesdir}/
+
 %if "%{?ibase}" != "-no-sql-ibase"
 %files ibase
 %{_qt5_plugindir}/sqldrivers/libqsqlibase.so
@@ -657,6 +665,9 @@ popd
 
 
 %changelog
+* Sat Jan 25 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-5
+- -examples subpkg 
+
 * Mon Jan 13 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.2.0-4
 - fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
 - fix QTBUG-35460 (error message for CVE-2013-4549 is misspelled)
