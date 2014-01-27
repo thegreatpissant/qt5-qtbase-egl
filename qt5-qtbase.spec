@@ -16,7 +16,7 @@
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
 %ifarch %{arm} %{ix86} x86_64
-%define docs 1
+#define docs 1
 %endif
 
 #define pre rc1
@@ -26,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -59,6 +59,9 @@ Patch4: qt-everywhere-opensource-src-4.8.5-QTBUG-35459.patch
 
 # fix QTBUG-35460 (error message for CVE-2013-4549 is misspelled)
 Patch5: qt-everywhere-opensource-src-4.8.5-QTBUG-35460.patch
+
+# unconditionally enable freetype lcdfilter support
+Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 
 # upstreamable patches
 # support poll
@@ -248,6 +251,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch3 -p1 -b .qatomic-ppc
 %patch4 -p1 -b .QTBUG-35459
 %patch5 -p1 -b .QTBUG-35460
+%patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .bigendian
@@ -665,6 +669,10 @@ popd
 
 
 %changelog
+* Mon Jan 27 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.2.0-7
+- unconditionally enable freetype lcd_filter
+- (temp) disable docs (libxcb bootstrap)
+
 * Sun Jan 26 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-6
 - fix %%_qt5_examplesdir macro
 
