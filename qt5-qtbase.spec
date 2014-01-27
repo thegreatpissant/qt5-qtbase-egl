@@ -26,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -382,7 +382,7 @@ cat >%{buildroot}%{rpm_macros_dir}/macros.qt5<<EOF
 %%_qt5_bindir %%{_qt5_prefix}/bin
 %%_qt5_datadir %%{_datadir}/qt5
 %%_qt5_docdir %%{_docdir}/qt5
-%%_qt5_examples %%{_qt5_prefix}/examples
+%%_qt5_examplesdir %%{_qt5_prefix}/examples
 %%_qt5_headerdir %%{_includedir}/qt5
 %%_qt5_importdir %%{_qt5_archdatadir}/imports
 %%_qt5_libdir %%{_libdir}
@@ -665,6 +665,9 @@ popd
 
 
 %changelog
+* Sun Jan 26 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-6
+- fix %%_qt5_examplesdir macro
+
 * Sat Jan 25 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-5
 - -examples subpkg 
 
