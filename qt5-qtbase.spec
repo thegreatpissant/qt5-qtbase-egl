@@ -16,7 +16,7 @@
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
 %ifarch %{arm} %{ix86} x86_64
-#define docs 1
+%define docs 1
 %endif
 
 #define pre rc1
@@ -26,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -669,6 +669,9 @@ popd
 
 
 %changelog
+* Tue Jan 28 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-8
+- (re)enable -docs
+
 * Mon Jan 27 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.2.0-7
 - unconditionally enable freetype lcd_filter
 - (temp) disable docs (libxcb bootstrap)
