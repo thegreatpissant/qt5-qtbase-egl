@@ -26,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -45,6 +45,10 @@ Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/subm
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
 Source5: qconfig-multilib.h
 
+# xinitrc script to check for OpenGL 1 only drivers and automatically set
+# QT_XCB_FORCE_SOFTWARE_OPENGL for them
+Source6: 10-qt5-check-opengl2.sh
+
 # help build on some lowmem archs, e.g. drop hard-coded -O3 optimization on some files
 Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
 
@@ -59,6 +63,10 @@ Patch4: qt-everywhere-opensource-src-4.8.5-QTBUG-35459.patch
 
 # fix QTBUG-35460 (error message for CVE-2013-4549 is misspelled)
 Patch5: qt-everywhere-opensource-src-4.8.5-QTBUG-35460.patch
+
+# add a QT_XCB_FORCE_SOFTWARE_OPENGL environment variable to allow forcing
+# LIBGL_ALWAYS_SOFTWARE (llvmpipe) for Qt 5 apps only
+Patch6: qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe.patch
 
 # unconditionally enable freetype lcdfilter support
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
@@ -237,6 +245,13 @@ Summary: Qt5 GUI-related libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
+
+# for Source6: 10-qt5-check-opengl2.sh:
+# directory ownership
+Requires: xorg-x11-xinit
+# glxinfo
+Requires: glx-utils
+
 %description gui
 Qt5 libraries used for drawing widgets and OpenGL items.
 
@@ -251,6 +266,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch3 -p1 -b .qatomic-ppc
 %patch4 -p1 -b .QTBUG-35459
 %patch5 -p1 -b .QTBUG-35460
+%patch6 -p1 -b .allow-forcing-llvmpipe
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch50 -p1 -b .poll
@@ -450,6 +466,8 @@ for prl_file in libQt5*.prl ; do
 done
 popd
 
+install -p -m755 -D %{SOURCE6} %{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
+
 
 ## work-in-progress, doesn't work yet -- rex
 %check
@@ -646,6 +664,7 @@ popd
 %postun gui -p /sbin/ldconfig
 
 %files gui
+%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 %{_qt5_libdir}/libQt5Gui.so.5*
 %{_qt5_libdir}/libQt5OpenGL.so.5*
 %{_qt5_libdir}/libQt5PrintSupport.so.5*
@@ -669,6 +688,9 @@ popd
 
 
 %changelog
+* Wed Jan 29 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.2.0-9
+- use software OpenGL (llvmpipe) if the hardware driver doesn't support OpenGL 2
+
 * Tue Jan 28 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-8
 - (re)enable -docs
 
