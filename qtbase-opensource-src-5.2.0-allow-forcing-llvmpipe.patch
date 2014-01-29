@@ -1,15 +1,18 @@
 diff -ur qtbase-opensource-src-5.2.0/src/platformsupport/glxconvenience/qglxconvenience.cpp qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe/src/platformsupport/glxconvenience/qglxconvenience.cpp
 --- qtbase-opensource-src-5.2.0/src/platformsupport/glxconvenience/qglxconvenience.cpp	2013-12-08 18:09:47.000000000 +0100
-+++ qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe/src/platformsupport/glxconvenience/qglxconvenience.cpp	2014-01-29 18:18:47.000000000 +0100
-@@ -43,6 +43,7 @@
++++ qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe/src/platformsupport/glxconvenience/qglxconvenience.cpp	2014-01-29 19:03:23.000000000 +0100
+@@ -39,6 +39,10 @@
+ **
+ ****************************************************************************/
+ 
++// We have to include this before the X11 headers dragged in by
++// qglxconvenience_p.h.
++#include <QtCore/QByteArray>
++
+ #include "qglxconvenience_p.h"
  
  #include <QtCore/QVector>
- #include <QtCore/QVarLengthArray>
-+#include <QtCore/QByteArray>
- 
- #ifndef QT_NO_XRENDER
- #include <X11/extensions/Xrender.h>
-@@ -116,6 +117,27 @@
+@@ -116,6 +120,27 @@
  
  GLXFBConfig qglx_findConfig(Display *display, int screen , const QSurfaceFormat &format, int drawableBit)
  {
@@ -37,7 +40,7 @@ diff -ur qtbase-opensource-src-5.2.0/src/platformsupport/glxconvenience/qglxconv
      bool reduced = true;
      GLXFBConfig chosenConfig = 0;
      QSurfaceFormat reducedFormat = format;
-@@ -159,6 +181,10 @@
+@@ -159,6 +184,10 @@
              reducedFormat = qglx_reduceSurfaceFormat(reducedFormat,&reduced);
      }
  
