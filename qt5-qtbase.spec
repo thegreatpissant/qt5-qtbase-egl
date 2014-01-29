@@ -466,7 +466,7 @@ for prl_file in libQt5*.prl ; do
 done
 popd
 
-install -p -m755 -D %{SOURCE6} %{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
+install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 
 
 ## work-in-progress, doesn't work yet -- rex
