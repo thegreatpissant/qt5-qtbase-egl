@@ -1,10 +1,10 @@
-diff -ur qtbase-opensource-src-5.2.0/src/plugins/platforms/xcb/qglxintegration.cpp qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe/src/plugins/platforms/xcb/qglxintegration.cpp
---- qtbase-opensource-src-5.2.0/src/plugins/platforms/xcb/qglxintegration.cpp	2013-12-08 18:09:53.000000000 +0100
-+++ qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe/src/plugins/platforms/xcb/qglxintegration.cpp	2014-01-29 02:58:13.000000000 +0100
-@@ -173,6 +173,27 @@
-     if (m_format.renderableType() != QSurfaceFormat::OpenGL && m_format.renderableType() != QSurfaceFormat::OpenGLES)
-         return;
+diff -ur qtbase-opensource-src-5.2.0/src/platformsupport/glxconvenience/qglxconvenience.cpp qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe/src/platformsupport/glxconvenience/qglxconvenience.cpp
+--- qtbase-opensource-src-5.2.0/src/platformsupport/glxconvenience/qglxconvenience.cpp	2013-12-08 18:09:47.000000000 +0100
++++ qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe/src/platformsupport/glxconvenience/qglxconvenience.cpp	2014-01-29 16:41:53.000000000 +0100
+@@ -116,6 +116,27 @@
  
+ GLXFBConfig qglx_findConfig(Display *display, int screen , const QSurfaceFormat &format, int drawableBit)
+ {
 +    // Allow forcing LIBGL_ALWAYS_SOFTWARE for Qt 5 applications only.
 +    // This is most useful with drivers that only support OpenGL 1.
 +    // We need OpenGL 2, but the user probably doesn't want
@@ -26,45 +26,17 @@ diff -ur qtbase-opensource-src-5.2.0/src/plugins/platforms/xcb/qglxintegration.c
 +    if (forceSoftwareOpenGL)
 +        qputenv("LIBGL_ALWAYS_SOFTWARE", "1");
 +
-     if (share)
-         m_shareContext = static_cast<const QGLXContext*>(share)->glxContext();
+     bool reduced = true;
+     GLXFBConfig chosenConfig = 0;
+     QSurfaceFormat reducedFormat = format;
+@@ -159,6 +180,10 @@
+             reducedFormat = qglx_reduceSurfaceFormat(reducedFormat,&reduced);
+     }
  
-@@ -267,8 +288,12 @@
-         // Could not create a context using glXCreateContextAttribsARB, falling back to glXCreateNewContext.
-         if (!m_context) {
-             // requesting an OpenGL ES context requires glXCreateContextAttribsARB, so bail out
--            if (m_format.renderableType() == QSurfaceFormat::OpenGLES)
-+            if (m_format.renderableType() == QSurfaceFormat::OpenGLES) {
-+                // unset LIBGL_ALWAYS_SOFTWARE now so other processes don't inherit it
-+                if (forceSoftwareOpenGL)
-+                    qunsetenv("LIBGL_ALWAYS_SOFTWARE");
-                 return;
-+            }
- 
-             m_context = glXCreateNewContext(DISPLAY_FROM_XCB(screen), config, GLX_RGBA_TYPE, m_shareContext, true);
-             if (!m_context && m_shareContext) {
-@@ -287,8 +312,12 @@
-         window = createDummyWindow(screen, config);
-     } else {
-         // requesting an OpenGL ES context requires glXCreateContextAttribsARB, so bail out
--        if (m_format.renderableType() == QSurfaceFormat::OpenGLES)
-+        if (m_format.renderableType() == QSurfaceFormat::OpenGLES) {
-+            // unset LIBGL_ALWAYS_SOFTWARE now so other processes don't inherit it
-+            if (forceSoftwareOpenGL)
-+                qunsetenv("LIBGL_ALWAYS_SOFTWARE");
-             return;
-+        }
- 
-         // Note that m_format gets updated with the used surface format
-         visualInfo = qglx_findVisualInfo(DISPLAY_FROM_XCB(screen), screen->screenNumber(), &m_format);
-@@ -317,6 +346,10 @@
- 
-     // Destroy our temporary window
-     XDestroyWindow(DISPLAY_FROM_XCB(screen), window);
-+
 +    // unset LIBGL_ALWAYS_SOFTWARE now so other processes don't inherit it
 +    if (forceSoftwareOpenGL)
 +        qunsetenv("LIBGL_ALWAYS_SOFTWARE");
++
+     return chosenConfig;
  }
  
- QGLXContext::~QGLXContext()

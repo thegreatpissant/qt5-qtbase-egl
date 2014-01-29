@@ -26,7 +26,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -688,6 +688,9 @@ popd
 
 
 %changelog
+* Wed Jan 29 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.2.0-10
+- fix the allow-forcing-llvmpipe patch to patch actual caller of __glXInitialize
+
 * Wed Jan 29 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.2.0-9
 - use software OpenGL (llvmpipe) if the hardware driver doesn't support OpenGL 2
 
