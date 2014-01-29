@@ -1,6 +1,6 @@
 diff -ur qtbase-opensource-src-5.2.0/src/platformsupport/glxconvenience/qglxconvenience.cpp qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe/src/platformsupport/glxconvenience/qglxconvenience.cpp
 --- qtbase-opensource-src-5.2.0/src/platformsupport/glxconvenience/qglxconvenience.cpp	2013-12-08 18:09:47.000000000 +0100
-+++ qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe/src/platformsupport/glxconvenience/qglxconvenience.cpp	2014-01-29 16:41:53.000000000 +0100
++++ qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe/src/platformsupport/glxconvenience/qglxconvenience.cpp	2014-01-29 17:41:57.000000000 +0100
 @@ -116,6 +116,27 @@
  
  GLXFBConfig qglx_findConfig(Display *display, int screen , const QSurfaceFormat &format, int drawableBit)
@@ -17,14 +17,14 @@ diff -ur qtbase-opensource-src-5.2.0/src/platformsupport/glxconvenience/qglxconv
 +        // get inherited by other processes, of course only if it wasn't
 +        // already set before.
 +        if (!qEnvironmentVariableIsEmpty("QT_XCB_FORCE_SOFTWARE_OPENGL")
-+            && qEnvironmentVariableIsEmpty("LIBGL_ALWAYS_SOFTWARE"))
++            && !qEnvironmentVariableIsSet("LIBGL_ALWAYS_SOFTWARE"))
 +            forceSoftwareOpenGL = true;
 +
 +        checkedForceSoftwareOpenGL = true;
 +    }
 +
 +    if (forceSoftwareOpenGL)
-+        qputenv("LIBGL_ALWAYS_SOFTWARE", "1");
++        qputenv("LIBGL_ALWAYS_SOFTWARE", QByteArrayLiteral("1"));
 +
      bool reduced = true;
      GLXFBConfig chosenConfig = 0;
