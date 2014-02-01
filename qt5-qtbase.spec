@@ -6,11 +6,7 @@
 %define qtchooser 1
 %global qt_module qtbase
 
-%if 0%{?fedora} > 18
-%define rpm_macros_dir %{_rpmconfigdir}/macros.d
-%else
-%define rpm_macros_dir %{_sysconfdir}/rpm
-%endif
+%global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
@@ -26,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -688,6 +684,9 @@ popd
 
 
 %changelog
+* Sat Feb 01 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-11
+- better %%rpm_macros_dir handling
+
 * Wed Jan 29 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.2.0-10
 - fix the allow-forcing-llvmpipe patch to patch actual caller of __glXInitialize
 
