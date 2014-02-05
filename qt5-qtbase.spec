@@ -21,8 +21,8 @@
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.2.0
-Release: 11%{?dist}
+Version: 5.2.1
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -57,9 +57,6 @@ Patch3: qtbase-qatomic-ppc.patch
 # fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
 Patch4: qt-everywhere-opensource-src-4.8.5-QTBUG-35459.patch
 
-# fix QTBUG-35460 (error message for CVE-2013-4549 is misspelled)
-Patch5: qt-everywhere-opensource-src-4.8.5-QTBUG-35460.patch
-
 # add a QT_XCB_FORCE_SOFTWARE_OPENGL environment variable to allow forcing
 # LIBGL_ALWAYS_SOFTWARE (llvmpipe) for Qt 5 apps only
 Patch6: qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe.patch
@@ -72,10 +69,6 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 # https://bugreports.qt-project.org/browse/QTBUG-27195
 # NEEDS REBASE
 Patch50: qt5-poll.patch
-# fix big endian builds
-Patch51: qtbase-opensource-src-5.1.1-bigendian.patch
-# fix build with -system-harfbuzz
-Patch52: qtbase-opensource-src-5.2.0-alpha-harfbuzz.patch
 
 ##upstream patches
 
@@ -261,13 +254,10 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 %patch3 -p1 -b .qatomic-ppc
 %patch4 -p1 -b .QTBUG-35459
-%patch5 -p1 -b .QTBUG-35460
 %patch6 -p1 -b .allow-forcing-llvmpipe
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch50 -p1 -b .poll
-%patch51 -p1 -b .bigendian
-%patch52 -p1 -b .harfbuzz
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -684,6 +674,9 @@ popd
 
 
 %changelog
+* Wed Feb 05 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-1
+- 5.2.1
+
 * Sat Feb 01 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-11
 - better %%rpm_macros_dir handling
 
