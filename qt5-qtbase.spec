@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -101,27 +101,32 @@ BuildRequires: findutils
 BuildRequires: libjpeg-devel
 BuildRequires: libmng-devel
 BuildRequires: libtiff-devel
+BuildRequires: pkgconfig(alsa)
 BuildRequires: pkgconfig(dbus-1)
+BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gtk+-2.0)
+# xcb-sm
+BuildRequires: pkgconfig(ice) pkgconfig(sm)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libudev)
 BuildRequires: pkgconfig(NetworkManager)
 BuildRequires: pkgconfig(openssl)
+BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
 BuildRequires: pkgconfig(xkbcommon)
 %endif
 %if 0%{?fedora} || 0%{?rhel} > 6
 BuildRequires: pkgconfig(atspi-2)
+BuildRequires: pkgconfig(egl)
+BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(glesv2)
 BuildRequires: pkgconfig(sqlite3) >= 3.7
 %define sqlite -system-sqlite
-#if 0%{?fedora} > 18
 BuildRequires: pkgconfig(harfbuzz) >= 0.9.19
 %define harfbuzz -system-harfbuzz
-#endif
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
@@ -130,7 +135,7 @@ BuildRequires: pkgconfig(xcb-xkb)
 BuildRequires: libicu-devel
 %define pcre -qt-pcre
 %endif
-BuildRequires: pkgconfig(xcb) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
+BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
 
 ## Sql drivers
@@ -666,6 +671,7 @@ popd
 %{_qt5_plugindir}/platforminputcontexts/libcomposeplatforminputcontextplugin.so
 %{_qt5_plugindir}/platforminputcontexts/libibusplatforminputcontextplugin.so
 %{_qt5_plugindir}/platforms/libqeglfs.so
+%{_qt5_plugindir}/platforms/libqkms.so
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
 %{_qt5_plugindir}/platforms/libqminimalegl.so
@@ -676,6 +682,9 @@ popd
 
 
 %changelog
+* Wed Feb 05 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-2
+- qconfig.pri: +alsa +kms +pulseaudio +xcb-sm
+
 * Wed Feb 05 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-1
 - 5.2.1
 
