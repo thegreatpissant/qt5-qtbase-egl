@@ -119,6 +119,7 @@ BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 BuildRequires: pkgconfig(xkbcommon)
 %endif
 %if 0%{?fedora} || 0%{?rhel} > 6
+%define egl 1
 BuildRequires: pkgconfig(atspi-2)
 BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(gbm)
@@ -670,11 +671,13 @@ popd
 %{_qt5_plugindir}/imageformats/libqjpeg.so
 %{_qt5_plugindir}/platforminputcontexts/libcomposeplatforminputcontextplugin.so
 %{_qt5_plugindir}/platforminputcontexts/libibusplatforminputcontextplugin.so
+%if 0%{?egl}
 %{_qt5_plugindir}/platforms/libqeglfs.so
 %{_qt5_plugindir}/platforms/libqkms.so
+%{_qt5_plugindir}/platforms/libqminimalegl.so
+%endif
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
-%{_qt5_plugindir}/platforms/libqminimalegl.so
 %{_qt5_plugindir}/platforms/libqoffscreen.so
 %{_qt5_plugindir}/platforms/libqxcb.so
 %{_qt5_plugindir}/platformthemes/libqgtk2.so
