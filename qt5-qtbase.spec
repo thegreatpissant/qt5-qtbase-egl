@@ -665,8 +665,10 @@ popd
 %{_qt5_plugindir}/imageformats/libqjpeg.so
 %{_qt5_plugindir}/platforminputcontexts/libcomposeplatforminputcontextplugin.so
 %{_qt5_plugindir}/platforminputcontexts/libibusplatforminputcontextplugin.so
+%{_qt5_plugindir}/platforms/libqeglfs.so
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
+%{_qt5_plugindir}/platforms/libqminimalegl.so
 %{_qt5_plugindir}/platforms/libqoffscreen.so
 %{_qt5_plugindir}/platforms/libqxcb.so
 %{_qt5_plugindir}/platformthemes/libqgtk2.so
