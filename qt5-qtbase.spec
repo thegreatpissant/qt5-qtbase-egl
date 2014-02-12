@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -685,6 +685,9 @@ popd
 
 
 %changelog
+* Wed Feb 12 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-3
+- rebuild (libicu)
+
 * Wed Feb 05 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-2
 - qconfig.pri: +alsa +kms +pulseaudio +xcb-sm
 
