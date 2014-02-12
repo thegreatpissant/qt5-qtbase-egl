@@ -12,7 +12,7 @@
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
 %ifarch %{arm} %{ix86} x86_64
-%define docs 1
+#define docs 1
 %endif
 
 #define pre rc1
@@ -686,7 +686,7 @@ popd
 
 %changelog
 * Wed Feb 12 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-3
-- rebuild (libicu)
+- bootstrap for libicu bump
 
 * Wed Feb 05 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-2
 - qconfig.pri: +alsa +kms +pulseaudio +xcb-sm
