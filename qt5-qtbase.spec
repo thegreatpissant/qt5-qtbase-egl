@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -287,10 +287,7 @@ sed -i -e "s|^\(QMAKE_LFLAGS_RELEASE.*\)|\1 $RPM_LD_FLAGS|" \
   mkspecs/common/g++-unix.conf
 
 # undefine QMAKE_STRIP (and friends), so we get useful -debuginfo pkgs (#1065636)
-sed -i \
-  -e 's|^QMAKE_STRIP             =.*|QMAKE_STRIP             =|' \
-  -e 's|^QMAKE_STRIPFLAGS_LIB   +=.*|QMAKE_STRIPFLAGS_LIB   +=|' \
-  mkspecs/common/linux.conf
+sed -i -e 's|^\(QMAKE_STRIP.*=\).*$|\1|g' mkspecs/common/linux.conf
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
@@ -691,6 +688,9 @@ popd
 
 
 %changelog
+* Sat Mar 08 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> 5.2.1-5
+- make the QMAKE_STRIP sed not sensitive to whitespace (see #1074041 in Qt 4)
+
 * Tue Feb 18 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-4
 - undefine QMAKE_STRIP (and friends), so we get useful -debuginfo pkgs (#1065636)
 
