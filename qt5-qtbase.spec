@@ -1,6 +1,6 @@
 # See http://bugzilla.redhat.com/223663
-%define multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9
-%define multilib_basearchs x86_64 ppc64 s390x sparc64
+%define multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9 ppc64le
+%define multilib_basearchs x86_64 ppc64 s390x sparc64 ppc64le
 
 # support qtchooser (adds qtchooser .conf file)
 %define qtchooser 1
@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -688,6 +688,9 @@ popd
 
 
 %changelog
+* Wed Mar 26 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-7
+- support ppc64le multilib (#1080629)
+
 * Wed Mar 12 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> 5.2.1-6
 - reenable documentation
 
