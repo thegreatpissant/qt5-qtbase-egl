@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.2.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -71,6 +71,10 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 Patch50: qt5-poll.patch
 
 ##upstream patches
+
+## security patches
+# https://bugreports.qt-project.org/browse/QTBUG-38367
+Patch200: qtbase-opensource-src-5.2.1-QTBUG-38367.patch
 
 # macros
 %define _qt5 %{name}
@@ -264,6 +268,8 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch50 -p1 -b .poll
+
+%patch200 -p1 -b .QTBUG-38367
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -688,6 +694,9 @@ popd
 
 
 %changelog
+* Thu Apr 24 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-8
+- DoS vulnerability in the GIF image handler (QTBUG-38367)
+
 * Wed Mar 26 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-7
 - support ppc64le multilib (#1080629)
 
