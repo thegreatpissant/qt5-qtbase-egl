@@ -284,6 +284,7 @@ popd
 
 %build
 
+# arm FTBFS -reduce-relocations, see https://bugreports.qt-project.org/browse/QTBUG-36129
 ./configure -v \
   -confirm-license \
   -opensource \
