@@ -463,7 +463,7 @@ popd
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%files 
+%files
 %doc LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt
 %if 0%{?qtchooser}
 # not editable config files, so not using %%config here
@@ -531,6 +531,7 @@ popd
 %{_bindir}/rcc*
 %{_bindir}/syncqt*
 %{_bindir}/uic*
+%{_bindir}/qlalr
 %{_qt5_bindir}/moc*
 %{_qt5_bindir}/qdbuscpp2xml*
 %{_qt5_bindir}/qdbusxml2cpp*
@@ -539,6 +540,7 @@ popd
 %{_qt5_bindir}/rcc*
 %{_qt5_bindir}/syncqt*
 %{_qt5_bindir}/uic*
+%{_qt5_bindir}/qlalr
 %if "%{_qt5_headerdir}" != "%{_includedir}"
 %dir %{_qt5_headerdir}
 %endif
