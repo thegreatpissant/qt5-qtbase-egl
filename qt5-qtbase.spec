@@ -318,7 +318,9 @@ popd
   -no-rpath \
   -no-separate-debug-info \
   -no-strip \
+%ifnarch %{arm}
   -reduce-relocations \
+%endif
   %{?harfbuzz} \
   -system-libjpeg \
   -system-libpng \
