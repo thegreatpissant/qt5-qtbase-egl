@@ -21,8 +21,8 @@
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.2.1
-Release: 8%{?dist}
+Version: 5.3.0
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -45,21 +45,11 @@ Source5: qconfig-multilib.h
 # QT_XCB_FORCE_SOFTWARE_OPENGL for them
 Source6: 10-qt5-check-opengl2.sh
 
-# help build on some lowmem archs, e.g. drop hard-coded -O3 optimization on some files
-Patch1: qtbase-opensource-src-5.0.2-lowmem.patch
-
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
 
-# qatomic on ppc/ppc64, http://bugzilla.redhat.com/1005482
-Patch3: qtbase-qatomic-ppc.patch
-
 # fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
 Patch4: qt-everywhere-opensource-src-4.8.5-QTBUG-35459.patch
-
-# add a QT_XCB_FORCE_SOFTWARE_OPENGL environment variable to allow forcing
-# LIBGL_ALWAYS_SOFTWARE (llvmpipe) for Qt 5 apps only
-Patch6: qtbase-opensource-src-5.2.0-allow-forcing-llvmpipe.patch
 
 # unconditionally enable freetype lcdfilter support
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
@@ -71,10 +61,6 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 Patch50: qt5-poll.patch
 
 ##upstream patches
-
-## security patches
-# https://bugreports.qt-project.org/browse/QTBUG-38367
-Patch200: qtbase-opensource-src-5.2.1-QTBUG-38367.patch
 
 # macros
 %define _qt5 %{name}
@@ -262,22 +248,13 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
-%patch3 -p1 -b .qatomic-ppc
 %patch4 -p1 -b .QTBUG-35459
-%patch6 -p1 -b .allow-forcing-llvmpipe
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch50 -p1 -b .poll
 
-%patch200 -p1 -b .QTBUG-38367
-
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
-
-# lowmem hacks
-#ifarch %{arm} s390
-%patch1 -p1 -b .lowmem
-#endif
 
 %define platform linux-g++
 %ifarch %{multilib_archs}
@@ -694,6 +671,9 @@ popd
 
 
 %changelog
+* Wed May 21 2014 Jan Grulich <jgrulich@redhat.com> 5.3.0-1
+- 5.3.0
+
 * Thu Apr 24 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.1-8
 - DoS vulnerability in the GIF image handler (QTBUG-38367)
 
