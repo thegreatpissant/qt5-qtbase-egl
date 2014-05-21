@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -284,7 +284,7 @@ popd
 
 %build
 
-# arm FTBFS -reduce-relocations, see https://bugreports.qt-project.org/browse/QTBUG-36129
+# limit -reduce-relocations to %%ix86 x86_64 archs, https://bugreports.qt-project.org/browse/QTBUG-36129
 ./configure -v \
   -confirm-license \
   -opensource \
@@ -319,7 +319,7 @@ popd
   -no-rpath \
   -no-separate-debug-info \
   -no-strip \
-%ifnarch %{arm}
+%ifarch %{ix86} x86_64
   -reduce-relocations \
 %endif
   %{?harfbuzz} \
@@ -676,6 +676,9 @@ popd
 
 
 %changelog
+* Wed May 21 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.0-2
+- limit -reduce-relocations to %%ix86 x86_64 archs (QTBUG-36129)
+
 * Wed May 21 2014 Jan Grulich <jgrulich@redhat.com> 5.3.0-1
 - 5.3.0
 
