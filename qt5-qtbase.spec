@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -105,9 +105,7 @@ BuildRequires: pkgconfig(libudev)
 BuildRequires: pkgconfig(NetworkManager)
 BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
-# waiting on libxkbcommon update, https://bugzilla.redhat.com/1000497
-#if 0%{?fedora} > 20
-%if 0
+%if 0%{?fedora} > 20
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 %global xkbcommon -system-xkbcommon
@@ -685,6 +683,9 @@ popd
 
 
 %changelog
+* Fri May 23 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.0-4
+- -system-libxkbcommon (f21+)
+
 * Thu May 22 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.0-3
 - qt5-qtbase-5.3.0-2.fc21 breaks keyboard input (#1100213)
 
