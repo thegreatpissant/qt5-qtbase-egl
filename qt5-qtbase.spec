@@ -109,8 +109,13 @@ BuildRequires: pkgconfig(NetworkManager)
 BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora} > 20
-BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
+BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 %global xkbcommon -system-xkbcommon
+BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
+BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
+## if no xcb-xkb > 1.10 or xkbcommon-x11
+## ie, to allow libxkbcommon backport for f19/f20
+#global no_xkbcommon_x11 1
 %else
 Provides: bundled(libxkbcommon) = 0.4.1
 %global xkbcommon -qt-xkbcommon
@@ -129,7 +134,6 @@ BuildRequires: pkgconfig(harfbuzz) >= 0.9.19
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
-BuildRequires: pkgconfig(xcb-xkb)
 %else
 BuildRequires: libicu-devel
 %define pcre -qt-pcre
@@ -252,7 +256,9 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %prep
 %setup -q -n qtbase-opensource-src-%{version}%{?pre:-%{pre}}
 
+%if 0%{?no_xkbcommon_x11}
 %patch1 -p1 -b .no_xkbcommon-x11
+%endif
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
@@ -687,7 +693,8 @@ popd
 
 %changelog
 * Tue May 27 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.0-5
-- libcomposeplatforminputcontextplugin doesn't need xkbcommon-x11
+- BR: pkgconfig(xcb-xkb) > 1.10 (f21+)
+- allow possibility for libxkbcommon-0.4.x only
 
 * Fri May 23 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.0-4
 - -system-libxkbcommon (f21+)
