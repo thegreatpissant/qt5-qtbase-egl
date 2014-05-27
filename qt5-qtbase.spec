@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -44,6 +44,9 @@ Source5: qconfig-multilib.h
 # xinitrc script to check for OpenGL 1 only drivers and automatically set
 # QT_XCB_FORCE_SOFTWARE_OPENGL for them
 Source6: 10-qt5-check-opengl2.sh
+
+# drop configure check for xkbcommon-x11
+Patch1: qtbase-opensource-src-5.3.0-no_xkbcommon-x11.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
@@ -107,7 +110,6 @@ BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora} > 20
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
-BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 %global xkbcommon -system-xkbcommon
 %else
 Provides: bundled(libxkbcommon) = 0.4.1
@@ -250,6 +252,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %prep
 %setup -q -n qtbase-opensource-src-%{version}%{?pre:-%{pre}}
 
+%patch1 -p1 -b .no_xkbcommon-x11
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
@@ -683,6 +686,9 @@ popd
 
 
 %changelog
+* Tue May 27 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.0-5
+- libcomposeplatforminputcontextplugin doesn't need xkbcommon-x11
+
 * Fri May 23 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.0-4
 - -system-libxkbcommon (f21+)
 
