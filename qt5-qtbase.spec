@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -333,6 +333,9 @@ popd
   -no-pch \
   -no-rpath \
   -no-separate-debug-info \
+%ifarch %{ix86}
+  -no-sse2 \
+%endif
   -no-strip \
 %ifarch %{ix86} x86_64
   -reduce-relocations \
@@ -692,6 +695,9 @@ popd
 
 
 %changelog
+* Fri May 30 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.0-6
+- %%ix86: build -no-sse2 (#1103185)
+
 * Tue May 27 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.0-5
 - BR: pkgconfig(xcb-xkb) > 1.10 (f21+)
 - allow possibility for libxkbcommon-0.4.x only
