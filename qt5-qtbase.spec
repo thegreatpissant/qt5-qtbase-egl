@@ -21,8 +21,8 @@
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.3.0
-Release: 7%{?dist}
+Version: 5.3.1
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -695,6 +695,9 @@ popd
 
 
 %changelog
+* Tue Jun 17 2014 Jan Grulich <jgrulich@redhat.com> - 5.3.1-1
+- 5.3.1
+
 * Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.3.0-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
