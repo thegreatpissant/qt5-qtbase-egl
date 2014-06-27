@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -53,6 +53,9 @@ Patch2: qtbase-multilib_optflags.patch
 
 # fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
 Patch4: qt-everywhere-opensource-src-4.8.5-QTBUG-35459.patch
+
+# Prefer QPA implementation in qsystemtrayicon_x11 if available
+Patch5: qtbase-5.3.1-prefer-qpa-implementation.patch
 
 # unconditionally enable freetype lcdfilter support
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
@@ -264,6 +267,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 %patch4 -p1 -b .QTBUG-35459
+%patch5 -p1 -b .prefer-qpa
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch50 -p1 -b .poll
@@ -695,6 +699,9 @@ popd
 
 
 %changelog
+* Fri Jun 27 2014 Jan Grulich <jgrulich@redhat.com> - 5.3.1-2
+- Prefer QPA implementation in qsystemtrayicon_x11 if available
+
 * Tue Jun 17 2014 Jan Grulich <jgrulich@redhat.com> - 5.3.1-1
 - 5.3.1
 
