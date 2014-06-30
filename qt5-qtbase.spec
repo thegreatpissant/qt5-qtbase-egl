@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -169,6 +169,9 @@ Requires: %{name}-odbc%{?_isa}
 Requires: %{name}-postgresql%{?_isa}
 %if "%{?tds}" != "-no-sql-tds"
 Requires: %{name}-tds%{?_isa}
+%endif
+%if 0%{?egl}
+Requires: pkgconfig(egl)
 %endif
 Requires: pkgconfig(gl)
 %description devel
@@ -699,6 +702,9 @@ popd
 
 
 %changelog
+* Mon Jun 30 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.1-3
+- -devel: Requires: pkgconfig(egl)
+
 * Fri Jun 27 2014 Jan Grulich <jgrulich@redhat.com> - 5.3.1-2
 - Prefer QPA implementation in qsystemtrayicon_x11 if available
 
