@@ -22,7 +22,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -45,8 +45,8 @@ Source5: qconfig-multilib.h
 # QT_XCB_FORCE_SOFTWARE_OPENGL for them
 Source6: 10-qt5-check-opengl2.sh
 
-# drop configure check for xkbcommon-x11
-Patch1: qtbase-opensource-src-5.3.0-no_xkbcommon-x11.patch
+# support the old versions of libxcb and libxkbcommon in F19 and F20
+Patch1: qtbase-opensource-src-5.3.0-old-xcb.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
@@ -113,15 +113,13 @@ BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora} > 20
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
-%global xkbcommon -system-xkbcommon
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
-## if no xcb-xkb > 1.10 or xkbcommon-x11
-## ie, to allow libxkbcommon backport for f19/f20
-#global no_xkbcommon_x11 1
 %else
-Provides: bundled(libxkbcommon) = 0.4.1
-%global xkbcommon -qt-xkbcommon
+# apply our patch to support the old versions of xcb and xkbcommon
+%global old_xcb 1
+BuildRequires: pkgconfig(xcb-xkb)
+BuildRequires: pkgconfig(xkbcommon)
 %endif
 BuildRequires: pkgconfig(xkeyboard-config)
 %if 0%{?fedora} || 0%{?rhel} > 6
@@ -262,8 +260,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %prep
 %setup -q -n qtbase-opensource-src-%{version}%{?pre:-%{pre}}
 
-%if 0%{?no_xkbcommon_x11}
-%patch1 -p1 -b .no_xkbcommon-x11
+%if 0%{?old_xcb}
+%patch1 -p1 -b .old_xcb
 %endif
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
@@ -297,7 +295,7 @@ sed -i -e 's|^\(QMAKE_STRIP.*=\).*$|\1|g' mkspecs/common/linux.conf
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
-mv freetype libjpeg libpng zlib xcb UNUSED/
+mv freetype libjpeg libpng zlib xcb xkbcommon UNUSED/
 %if "%{?sqlite}" == "-system-sqlite"
 mv sqlite UNUSED/
 %endif
@@ -353,7 +351,7 @@ popd
   %{?pcre} \
   %{?sqlite} \
   %{?tds} \
-  %{?xkbcommon} \
+  -system-xkbcommon \
   -system-zlib
 
 make %{?_smp_mflags}
@@ -702,6 +700,10 @@ popd
 
 
 %changelog
+* Mon Jun 30 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> 5.3.1-4
+- support the old versions of libxcb and libxkbcommon in F19 and F20
+- don't use the bundled libxkbcommon
+
 * Mon Jun 30 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.1-3
 - -devel: Requires: pkgconfig(egl)
 
