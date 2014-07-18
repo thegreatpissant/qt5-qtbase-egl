@@ -112,15 +112,22 @@ BuildRequires: pkgconfig(NetworkManager)
 BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora} > 20
+%global xkbcommon -system-xkbcommon
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
-%else
-# apply our patch to support the old versions of xcb and xkbcommon
+%endif
+%if 0%{?fedora} && 0%{?fedora} < 20
+# else apply our patch to support the old versions of xcb and xkbcommon
 %global old_xcb 1
-BuildRequires: pkgconfig(xcb-xkb)
+%global xkbcommon -system-xkbcommon
 BuildRequires: pkgconfig(xkbcommon)
 %endif
+%if ! 0%{?xkbcommon:1}
+%global xkbcommon -qt-xkbcommon
+Provides: bundled(libxkbcommon) = 0.4.1
+%endif
+BuildRequires: pkgconfig(xcb-xkb)
 BuildRequires: pkgconfig(xkeyboard-config)
 %if 0%{?fedora} || 0%{?rhel} > 6
 %define egl 1
@@ -295,7 +302,7 @@ sed -i -e 's|^\(QMAKE_STRIP.*=\).*$|\1|g' mkspecs/common/linux.conf
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
-mv freetype libjpeg libpng zlib xcb xkbcommon UNUSED/
+mv freetype libjpeg libpng zlib xcb UNUSED/
 %if "%{?sqlite}" == "-system-sqlite"
 mv sqlite UNUSED/
 %endif
@@ -351,7 +358,7 @@ popd
   %{?pcre} \
   %{?sqlite} \
   %{?tds} \
-  -system-xkbcommon \
+  %{?xkbcommon} \
   -system-zlib
 
 make %{?_smp_mflags}
