@@ -111,19 +111,18 @@ BuildRequires: pkgconfig(libudev)
 BuildRequires: pkgconfig(NetworkManager)
 BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
-%if 0%{?fedora} > 20
+%if 0%{?fedora}
 %global xkbcommon -system-xkbcommon
+%if 0%{?fedora} > 20
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
-%endif
-%if 0%{?fedora} && 0%{?fedora} < 20
-# else apply our patch to support the old versions of xcb and xkbcommon
+%else
+# apply patch to support older versions of xcb and xkbcommon
 %global old_xcb 1
-%global xkbcommon -system-xkbcommon
 BuildRequires: pkgconfig(xkbcommon)
 %endif
-%if ! 0%{?xkbcommon:1}
+%else
 %global xkbcommon -qt-xkbcommon
 Provides: bundled(libxkbcommon) = 0.4.1
 %endif
