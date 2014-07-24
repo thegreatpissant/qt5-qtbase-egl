@@ -4,6 +4,13 @@
 
 # support qtchooser (adds qtchooser .conf file)
 %define qtchooser 1
+%if 0%{?qtchooser}
+%define priority 10
+%ifarch %{multilib_basearchs}
+%define priority 15
+%endif
+%endif
+
 %global qt_module qtbase
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
@@ -22,7 +29,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -148,6 +155,14 @@ BuildRequires: libicu-devel
 BuildRequires: pkgconfig(xcb) pkgconfig(xcb-glx) pkgconfig(xcb-icccm) pkgconfig(xcb-image) pkgconfig(xcb-keysyms) pkgconfig(xcb-renderutil)
 BuildRequires: pkgconfig(zlib)
 
+%if 0%{?qtchooser}
+%if 0%{?fedora}
+Conflicts: qt < 1:4.8.6-10
+%endif
+Requires(post): %{_sbindir}/update-alternatives
+Requires(postun): %{_sbindir}/update-alternatives
+%endif
+
 ## Sql drivers
 %if 0%{?rhel}
 %define ibase -no-sql-ibase
@@ -254,8 +269,6 @@ Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
 
 # for Source6: 10-qt5-check-opengl2.sh:
-# directory ownership
-Requires: xorg-x11-xinit
 # glxinfo
 Requires: glx-utils
 
@@ -454,14 +467,10 @@ popd
 %if 0%{?qtchooser}
   mkdir -p %{buildroot}%{_sysconfdir}/xdg/qtchooser
   pushd    %{buildroot}%{_sysconfdir}/xdg/qtchooser
-  echo "%{_qt5_bindir}" >  qt5.conf
-  echo "%{_qt5_prefix}" >> qt5.conf
-  %ifarch %{multilib_archs}
-    mv qt5.conf qt5-%{__isa_bits}.conf
-    %ifarch %{multilib_basearchs}
-      ln -sv qt5-%{__isa_bits}.conf qt5.conf
-    %endif
-  %endif
+  echo "%{_qt5_bindir}" >  qt5-%{__isa_bits}.conf
+  echo "%{_qt5_prefix}" >> qt5-%{__isa_bits}.conf
+  # alternatives targets
+  touch default.conf qt5.conf
   popd
 %endif
 
@@ -493,15 +502,45 @@ ctest --output-on-failure ||:
 popd
 
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%post
+/sbin/ldconfig
+%if 0%{?qtchooser}
+%{_sbindir}/update-alternatives \
+  --install %{_sysconfdir}/xdg/qtchooser/qt5.conf \
+  qtchooser-qt5 \
+  %{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf \
+  %{priority}
+
+%{_sbindir}/update-alternatives \
+  --install %{_sysconfdir}/xdg/qtchooser/default.conf \
+  qtchooser-default \
+  %{_sysconfdir}/xdg/qtchooser/qt5.conf \
+  %{priority}
+%endif
+
+%postun
+/sbin/ldconfig
+%if 0%{?qtchooser}
+if [ $1 -eq 0 ]; then
+%{_sbindir}/update-alternatives  \
+  --remove qtchooser-qt5 \
+  %{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf
+
+%{_sbindir}/update-alternatives  \
+  --remove qtchooser-default \
+  %{_sysconfdir}/xdg/qtchooser/qt5.conf
+fi
+%endif
+
 
 %files
 %doc LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt
 %if 0%{?qtchooser}
-# not editable config files, so not using %%config here
 %dir %{_sysconfdir}/xdg/qtchooser
-%{_sysconfdir}/xdg/qtchooser/*.conf
+# not editable config files, so not using %%config here
+%ghost %{_sysconfdir}/xdg/qtchooser/default.conf
+%ghost %{_sysconfdir}/xdg/qtchooser/qt5.conf
+%{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf
 %endif
 %{_qt5_libdir}/libQt5Concurrent.so.5*
 %{_qt5_libdir}/libQt5Core.so.5*
@@ -677,6 +716,8 @@ popd
 %postun gui -p /sbin/ldconfig
 
 %files gui
+%dir %{_sysconfdir}/X11/xinit
+%dir %{_sysconfdir}/X11/xinit/xinitrc.d/
 %{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 %{_qt5_libdir}/libQt5Gui.so.5*
 %{_qt5_libdir}/libQt5OpenGL.so.5*
@@ -706,6 +747,10 @@ popd
 
 
 %changelog
+* Thu Jul 24 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.3.1-5
+- drop dep on xorg-x11-xinit (own shared dirs instead)
+- fix/improve qtchooser support using alternatives (#1122316)
+
 * Mon Jun 30 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> 5.3.1-4
 - support the old versions of libxcb and libxkbcommon in F19 and F20
 - don't use the bundled libxkbcommon
