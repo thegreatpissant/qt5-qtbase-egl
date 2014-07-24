@@ -133,7 +133,6 @@ BuildRequires: pkgconfig(xkbcommon)
 %global xkbcommon -qt-xkbcommon
 Provides: bundled(libxkbcommon) = 0.4.1
 %endif
-BuildRequires: pkgconfig(xcb-xkb)
 BuildRequires: pkgconfig(xkeyboard-config)
 %if 0%{?fedora} || 0%{?rhel} > 6
 %define egl 1
@@ -148,6 +147,7 @@ BuildRequires: pkgconfig(harfbuzz) >= 0.9.19
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
+BuildRequires: pkgconfig(xcb-xkb)
 %else
 BuildRequires: libicu-devel
 %define pcre -qt-pcre
