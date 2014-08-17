@@ -29,7 +29,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -747,6 +747,9 @@ fi
 
 
 %changelog
+* Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.3.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
 * Thu Jul 24 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.3.1-5
 - drop dep on xorg-x11-xinit (own shared dirs instead)
 - fix/improve qtchooser support using alternatives (#1122316)
