@@ -19,7 +19,7 @@
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
 %ifarch %{arm} %{ix86} x86_64
-%define docs 1
+%define docs 0
 %endif
 
 #define pre rc1
