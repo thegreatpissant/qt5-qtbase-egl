@@ -53,7 +53,7 @@ Source5: qconfig-multilib.h
 Source6: 10-qt5-check-opengl2.sh
 
 # support the old versions of libxcb and libxkbcommon in F19 and F20
-Patch1: qtbase-opensource-src-5.3.0-old-xcb.patch
+Patch1: qtbase-opensource-src-5.3.2-old_xcb.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
