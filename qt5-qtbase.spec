@@ -28,8 +28,8 @@
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.3.1
-Release: 8%{?dist}
+Version: 5.3.2
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -59,7 +59,7 @@ Patch1: qtbase-opensource-src-5.3.0-old-xcb.patch
 Patch2: qtbase-multilib_optflags.patch
 
 # fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
-Patch4: qt-everywhere-opensource-src-4.8.5-QTBUG-35459.patch
+Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
 # Prefer QPA implementation in qsystemtrayicon_x11 if available
 Patch5: qtbase-5.3.1-prefer-qpa-implementation.patch
@@ -747,6 +747,9 @@ fi
 
 
 %changelog
+* Tue Sep 16 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-1
+- 5.3.2
+
 * Wed Aug 27 2014 David Tardon <dtardon@redhat.com> - 5.3.1-8
 - do a normal build with docs
 
