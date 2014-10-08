@@ -52,8 +52,12 @@ Source5: qconfig-multilib.h
 # QT_XCB_FORCE_SOFTWARE_OPENGL for them
 Source6: 10-qt5-check-opengl2.sh
 
-# support the old versions of libxcb and libxkbcommon in F19 and F20
-Patch1: qtbase-opensource-src-5.3.2-old_xcb.patch
+# support the old version of libxcb and the resulting lack of libxkbcommon-x11
+# in F19 and F20
+Patch0: qtbase-opensource-src-5.3.2-old_xcb.patch
+
+# support the old version of libxkbcommon in F19 and F20
+Patch1: qtbase-opensource-src-5.3.2-old_xkbcommon.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
@@ -125,8 +129,9 @@ BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 %else
-# apply patch to support older versions of xcb and xkbcommon
+# apply patches to support older versions of xcb and xkbcommon
 %global old_xcb 1
+%global old_xkbcommon 1
 BuildRequires: pkgconfig(xkbcommon)
 %endif
 %else
@@ -280,7 +285,10 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n qtbase-opensource-src-%{version}%{?pre:-%{pre}}
 
 %if 0%{?old_xcb}
-%patch1 -p1 -b .old_xcb
+%patch0 -p1 -b .old_xcb
+%if 0%{?old_xkbcommon}
+%patch1 -p1 -b .old_xkbcommon
+%endif
 %endif
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
