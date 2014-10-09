@@ -29,7 +29,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.2
-Release: 1%{?dist}.1
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -312,11 +312,6 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 
 %define platform linux-g++
-%ifarch %{multilib_archs}
-%if "%{?__isa_bits}" == "64"
-%define platform linux-g++-64
-%endif
-%endif
 
 sed -i -e "s|-O2|$RPM_OPT_FLAGS|g" \
   mkspecs/%{platform}/qmake.conf 
@@ -763,6 +758,9 @@ fi
 
 
 %changelog
+* Thu Oct 09 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-2
+- use linux-g++ platform unconditionally
+
 * Thu Oct 09 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> 5.3.2-1.1
 - F20: require libxkbcommon >= 0.4.1, only patch for the old libxcb
 
