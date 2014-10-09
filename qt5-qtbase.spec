@@ -29,7 +29,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.2
-Release: 1%{?dist}
+Release: 1%{?dist}.1
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -129,12 +129,20 @@ BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 %else
-# apply patches to support older versions of xcb and xkbcommon
+# apply patch to support older version of xcb, resulting lack of xkbcommon-x11
 %global old_xcb 1
-%global old_xkbcommon 1
+%if 0%{?fedora} > 19
+# Fedora 20
+BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
+%else
+# Fedora 19 and older
 BuildRequires: pkgconfig(xkbcommon)
+# apply patch to support older version of xkbcommon
+%global old_xkbcommon 1
+%endif
 %endif
 %else
+# not Fedora
 %global xkbcommon -qt-xkbcommon
 Provides: bundled(libxkbcommon) = 0.4.1
 %endif
@@ -755,6 +763,9 @@ fi
 
 
 %changelog
+* Thu Oct 09 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> 5.3.2-1.1
+- F20: require libxkbcommon >= 0.4.1, only patch for the old libxcb
+
 * Tue Sep 16 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-1
 - 5.3.2
 
