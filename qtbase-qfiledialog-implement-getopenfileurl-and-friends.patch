@@ -1,5 +1,5 @@
 diff --git a/src/widgets/dialogs/qfiledialog.cpp b/src/widgets/dialogs/qfiledialog.cpp
-index 9219757..4464b94 100644
+index 9219757..22fbe37 100644
 --- a/src/widgets/dialogs/qfiledialog.cpp
 +++ b/src/widgets/dialogs/qfiledialog.cpp
 @@ -2100,35 +2100,9 @@ QString QFileDialog::getOpenFileName(QWidget *parent,
@@ -51,8 +51,8 @@ index 9219757..4464b94 100644
 +    QFileDialogArgs args;
 +    args.parent = parent;
 +    args.caption = caption;
-+    args.directory = QFileDialogPrivate::workingDirectory(QUrl::fromLocalFile(dir));
-+    args.selection = QFileDialogPrivate::initialSelection(QUrl::fromLocalFile(dir));
++    args.directory = QFileDialogPrivate::workingDirectory(dir.toLocalFile());
++    args.selection = QFileDialogPrivate::initialSelection(dir.toLocalFile());
 +    args.filter = filter;
 +    args.mode = ExistingFile;
 +    args.options = options;
@@ -122,8 +122,8 @@ index 9219757..4464b94 100644
 +    QFileDialogArgs args;
 +    args.parent = parent;
 +    args.caption = caption;
-+    args.directory = QFileDialogPrivate::workingDirectory(QUrl::fromLocalFile(dir));
-+    args.selection = QFileDialogPrivate::initialSelection(QUrl::fromLocalFile(dir));
++    args.directory = QFileDialogPrivate::workingDirectory(dir.toLocalFile());
++    args.selection = QFileDialogPrivate::initialSelection(dir.toLocalFile());
 +    args.filter = filter;
 +    args.mode = ExistingFiles;
 +    args.options = options;
@@ -187,8 +187,8 @@ index 9219757..4464b94 100644
 +    QFileDialogArgs args;
 +    args.parent = parent;
 +    args.caption = caption;
-+    args.directory = QFileDialogPrivate::workingDirectory(QUrl::fromLocalFile(dir));
-+    args.selection = QFileDialogPrivate::initialSelection(QUrl::fromLocalFile(dir));
++    args.directory = QFileDialogPrivate::workingDirectory(dir.toLocalFile());
++    args.selection = QFileDialogPrivate::initialSelection(dir.toLocalFile());
 +    args.filter = filter;
 +    args.mode = AnyFile;
 +    args.options = options;
@@ -248,7 +248,7 @@ index 9219757..4464b94 100644
 +    QFileDialogArgs args;
 +    args.parent = parent;
 +    args.caption = caption;
-+    args.directory = QFileDialogPrivate::workingDirectory(QUrl::fromLocalFile(dir));
++    args.directory = QFileDialogPrivate::workingDirectory(dir.toLocalFile());
 +    args.mode = (options & ShowDirsOnly ? DirectoryOnly : Directory);
 +    args.options = options;
 +
