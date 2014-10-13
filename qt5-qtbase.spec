@@ -29,7 +29,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -78,6 +78,7 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 Patch50: qt5-poll.patch
 
 ##upstream patches
+Patch100: qtbase-qfiledialog-implement-getopenfileurl-and-friends.patch
 
 # macros
 %define _qt5 %{name}
@@ -307,6 +308,8 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch50 -p1 -b .poll
+
+%patch100 -p1 -b .qfiledialog-implement-getopenfileurl-and-friends
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -758,6 +761,9 @@ fi
 
 
 %changelog
+* Mon Oct 13 2014 Jan Grulich <jgrulich@redhat.com> 5.3.2-3
+- QFileDialog: implement getOpenFileUrl and friends for real
+
 * Thu Oct 09 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-2
 - use linux-g++ platform unconditionally
 
