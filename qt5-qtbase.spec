@@ -19,7 +19,7 @@
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
 %ifarch %{arm} %{ix86} x86_64
-#define docs 1
+%define docs 1
 %endif
 
 #define pre rc1
@@ -29,7 +29,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.2
-Release: 1%{?dist}.1
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -747,9 +747,6 @@ fi
 
 
 %changelog
-* Fri Oct 17 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-1.1
-- bootstrap el6
-
 * Tue Sep 16 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-1
 - 5.3.2
 
