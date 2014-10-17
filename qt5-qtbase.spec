@@ -29,7 +29,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.2
-Release: 1%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -52,8 +52,12 @@ Source5: qconfig-multilib.h
 # QT_XCB_FORCE_SOFTWARE_OPENGL for them
 Source6: 10-qt5-check-opengl2.sh
 
-# support the old versions of libxcb and libxkbcommon in F19 and F20
-Patch1: qtbase-opensource-src-5.3.0-old-xcb.patch
+# support the old version of libxcb and the resulting lack of libxkbcommon-x11
+# in F19 and F20
+Patch0: qtbase-opensource-src-5.3.2-old_xcb.patch
+
+# support the old version of libxkbcommon in F19 and F20
+Patch1: qtbase-opensource-src-5.3.2-old_xkbcommon.patch
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
@@ -74,6 +78,7 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 Patch50: qt5-poll.patch
 
 ##upstream patches
+Patch100: qtbase-qfiledialog-implement-getopenfileurl-and-friends.patch
 
 # macros
 %define _qt5 %{name}
@@ -125,11 +130,20 @@ BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 %else
-# apply patch to support older versions of xcb and xkbcommon
+# apply patch to support older version of xcb, resulting lack of xkbcommon-x11
 %global old_xcb 1
+%if 0%{?fedora} > 19
+# Fedora 20
+BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
+%else
+# Fedora 19 and older
 BuildRequires: pkgconfig(xkbcommon)
+# apply patch to support older version of xkbcommon
+%global old_xkbcommon 1
+%endif
 %endif
 %else
+# not Fedora
 %global xkbcommon -qt-xkbcommon
 Provides: bundled(libxkbcommon) = 0.4.1
 %endif
@@ -280,7 +294,10 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %setup -q -n qtbase-opensource-src-%{version}%{?pre:-%{pre}}
 
 %if 0%{?old_xcb}
-%patch1 -p1 -b .old_xcb
+%patch0 -p1 -b .old_xcb
+%if 0%{?old_xkbcommon}
+%patch1 -p1 -b .old_xkbcommon
+%endif
 %endif
 %patch2 -p1 -b .multilib_optflags
 # drop backup file(s), else they get installed too, http://bugzilla.redhat.com/639463
@@ -292,15 +309,12 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 #patch50 -p1 -b .poll
 
+%patch100 -p1 -b .qfiledialog-implement-getopenfileurl-and-friends
+
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 
 %define platform linux-g++
-%ifarch %{multilib_archs}
-%if "%{?__isa_bits}" == "64"
-%define platform linux-g++-64
-%endif
-%endif
 
 sed -i -e "s|-O2|$RPM_OPT_FLAGS|g" \
   mkspecs/%{platform}/qmake.conf 
@@ -747,6 +761,15 @@ fi
 
 
 %changelog
+* Mon Oct 13 2014 Jan Grulich <jgrulich@redhat.com> 5.3.2-3
+- QFileDialog: implement getOpenFileUrl and friends for real
+
+* Thu Oct 09 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-2
+- use linux-g++ platform unconditionally
+
+* Thu Oct 09 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> 5.3.2-1.1
+- F20: require libxkbcommon >= 0.4.1, only patch for the old libxcb
+
 * Tue Sep 16 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-1
 - 5.3.2
 

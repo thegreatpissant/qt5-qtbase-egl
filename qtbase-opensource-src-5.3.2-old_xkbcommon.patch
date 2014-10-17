@@ -1,0 +1,77 @@
+diff -ur qtbase-opensource-src-5.3.2-old_xcb/configure qtbase-opensource-src-5.3.2-old_xkbcommon/configure
+--- qtbase-opensource-src-5.3.2-old_xcb/configure	2014-10-08 19:46:02.000000000 +0200
++++ qtbase-opensource-src-5.3.2-old_xkbcommon/configure	2014-10-08 19:42:46.000000000 +0200
+@@ -5085,7 +5085,7 @@
+ fi
+ 
+ # Detect libxkbcommon
+-MIN_REQ_XKBCOMMON="0.4.1"
++MIN_REQ_XKBCOMMON="0.3.0"
+ ORIG_CFG_XKBCOMMON="$CFG_XKBCOMMON"
+ # currently only xcb platform plugin supports building xkbcommon
+ if [ "$CFG_XCB" != "no" ]; then
+diff -ur qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.cpp qtbase-opensource-src-5.3.2-old_xkbcommon/src/plugins/platforms/xcb/qxcbkeyboard.cpp
+--- qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.cpp	2014-10-08 19:46:02.000000000 +0200
++++ qtbase-opensource-src-5.3.2-old_xkbcommon/src/plugins/platforms/xcb/qxcbkeyboard.cpp	2014-10-08 19:42:46.000000000 +0200
+@@ -871,7 +871,7 @@
+         return QList<int>();
+ 
+     QList<int> result;
+-    int baseQtKey = keysymToQtKey(sym, modifiers, lookupString(kb_state, event->nativeScanCode()));
++    int baseQtKey = keysymToQtKey(sym, modifiers, keysymToUnicode(sym));
+     result += (baseQtKey + modifiers); // The base key is _always_ valid, of course
+ 
+     xkb_mod_index_t shiftMod = xkb_keymap_mod_get_index(xkb_keymap, "Shift");
+@@ -918,7 +918,7 @@
+                 continue;
+ 
+             Qt::KeyboardModifiers mods = modifiers & ~neededMods;
+-            qtKey = keysymToQtKey(sym, mods, lookupString(kb_state, event->nativeScanCode()));
++            qtKey = keysymToQtKey(sym, mods, keysymToUnicode(sym));
+ 
+             if (qtKey == baseQtKey)
+                 continue;
+@@ -1363,7 +1363,7 @@
+ 
+     Qt::KeyboardModifiers modifiers = translateModifiers(state);
+ 
+-    QString string = lookupString(xkb_state, code);
++    QString string = keysymToUnicode(sym);
+     int count = string.size();
+     string.truncate(count);
+ 
+@@ -1427,12 +1427,18 @@
+     }
+ }
+ 
+-QString QXcbKeyboard::lookupString(struct xkb_state *state, xcb_keycode_t code) const
++QString QXcbKeyboard::keysymToUnicode(xcb_keysym_t sym) const
+ {
+     QByteArray chars;
+-    chars.resize(1 + xkb_state_key_get_utf8(state, code, 0, 0));
+-    // equivalent of XLookupString
+-    xkb_state_key_get_utf8(state, code, chars.data(), chars.size());
++    int bytes;
++    chars.resize(7);
++
++    bytes = xkb_keysym_to_utf8(sym, chars.data(), chars.size());
++
++    if (bytes == -1)
++        qWarning("QXcbKeyboard::handleKeyEvent - buffer too small");
++    chars.resize(bytes-1);
++
+     return QString::fromUtf8(chars);
+ }
+ 
+diff -ur qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.h qtbase-opensource-src-5.3.2-old_xkbcommon/src/plugins/platforms/xcb/qxcbkeyboard.h
+--- qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.h	2014-10-08 19:46:02.000000000 +0200
++++ qtbase-opensource-src-5.3.2-old_xkbcommon/src/plugins/platforms/xcb/qxcbkeyboard.h	2014-10-08 19:42:46.000000000 +0200
+@@ -83,7 +83,7 @@
+     void handleKeyEvent(xcb_window_t sourceWindow, QEvent::Type type, xcb_keycode_t code, quint16 state, xcb_timestamp_t time);
+ 
+     void resolveMaskConflicts();
+-    QString lookupString(struct xkb_state *state, xcb_keycode_t code) const;
++    QString keysymToUnicode(xcb_keysym_t sym) const;
+     int keysymToQtKey(xcb_keysym_t keysym) const;
+     int keysymToQtKey(xcb_keysym_t keysym, Qt::KeyboardModifiers &modifiers, QString text) const;
+     void printKeymapError(const char *error) const;
