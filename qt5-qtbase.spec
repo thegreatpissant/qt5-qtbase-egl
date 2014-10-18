@@ -27,7 +27,7 @@
 %define examples 1
 %endif
 
-%define pre beta 
+%define pre beta
 #define snap 2014-10-07_40
 #define snap_tag 20141007_40
 
@@ -799,7 +799,7 @@ fi
 
 
 %changelog
-* Sat Oct 18 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.4.0-0.1.beta 
+* Sat Oct 18 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.4.0-0.1.beta
 - 5.4.0-beta
 - avoid extra -devel deps by moving *Plugin.cmake files to base pkgs
 - disable -doc,-examples to bootstrap other 5.4.0 modules
