@@ -15,8 +15,6 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-%global bootstrap 1
-
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
@@ -802,7 +800,7 @@ fi
 * Sat Oct 18 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.4.0-0.1.beta
 - 5.4.0-beta
 - avoid extra -devel deps by moving *Plugin.cmake files to base pkgs
-- disable -doc,-examples to bootstrap other 5.4.0 modules
+- support bootstrap macro, to disable -doc,-examples
 
 * Mon Oct 13 2014 Jan Grulich <jgrulich@redhat.com> 5.3.2-3
 - QFileDialog: implement getOpenFileUrl and friends for real
