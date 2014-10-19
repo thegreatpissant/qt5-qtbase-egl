@@ -57,7 +57,7 @@ Source6: 10-qt5-check-opengl2.sh
 
 # support the old version of libxcb and the resulting lack of libxkbcommon-x11
 # in F19 and F20
-Patch0: qtbase-opensource-src-5.3.2-old_xcb.patch
+Patch0: qtbase-opensource-src-5.4.0-old_xcb.patch
 
 # support the old version of libxkbcommon in F19 and F20
 Patch1: qtbase-opensource-src-5.3.2-old_xkbcommon.patch
@@ -155,8 +155,10 @@ BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(glesv2)
 BuildRequires: pkgconfig(sqlite3) >= 3.7
 %define sqlite -system-sqlite
-BuildRequires: pkgconfig(harfbuzz) >= 0.9.19
+%if 0%{?fedora} > 20
+BuildRequires: pkgconfig(harfbuzz) >= 0.9.31
 %define harfbuzz -system-harfbuzz
+%endif
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(libpcre) >= 8.30
 %define pcre -system-pcre
