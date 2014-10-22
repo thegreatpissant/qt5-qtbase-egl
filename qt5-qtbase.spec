@@ -32,7 +32,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 0.1.%{pre}%{?dist}
+Release: 0.2.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -99,6 +99,13 @@ Patch50: qt5-poll.patch
 %define _qt5_settingsdir %{_sysconfdir}/xdg
 %define _qt5_sysconfdir %{_qt5_settingsdir} 
 %define _qt5_translationdir %{_datadir}/qt5/translations
+
+# Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
+# Those themes are there for platform integration. If the required libraries are
+# not there, the platform to integrate with isn't either. Then Qt will just
+# silently ignore the plugin that fails to load. Thus, there is no need to let
+# RPM drag in gtk2 as a dependency for the GTK+ 2 dialog support.
+%global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
 # for %%check
 BuildRequires: cmake
@@ -799,6 +806,9 @@ fi
 
 
 %changelog
+* Wed Oct 22 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.4.0-0.2.beta
+- -gui: don't require gtk2 (__requires_exclude_from platformthemes) (#1154884)
+
 * Sat Oct 18 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.4.0-0.1.beta
 - 5.4.0-beta
 - avoid extra -devel deps by moving *Plugin.cmake files to base pkgs
