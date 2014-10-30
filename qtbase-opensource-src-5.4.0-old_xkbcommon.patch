@@ -1,28 +1,19 @@
-diff -ur qtbase-opensource-src-5.3.2-old_xcb/configure qtbase-opensource-src-5.3.2-old_xkbcommon/configure
---- qtbase-opensource-src-5.3.2-old_xcb/configure	2014-10-08 19:46:02.000000000 +0200
-+++ qtbase-opensource-src-5.3.2-old_xkbcommon/configure	2014-10-08 19:42:46.000000000 +0200
-@@ -5085,7 +5085,7 @@
+diff -up qtbase-opensource-src-5.4.0-beta/configure.old_xkbcommon qtbase-opensource-src-5.4.0-beta/configure
+--- qtbase-opensource-src-5.4.0-beta/configure.old_xkbcommon	2014-10-30 14:22:00.388881243 -0500
++++ qtbase-opensource-src-5.4.0-beta/configure	2014-10-30 14:23:39.800851375 -0500
+@@ -5143,7 +5143,7 @@ if [ "$CFG_KMS" != "no" ]; then
  fi
  
  # Detect libxkbcommon
 -MIN_REQ_XKBCOMMON="0.4.1"
 +MIN_REQ_XKBCOMMON="0.3.0"
- ORIG_CFG_XKBCOMMON="$CFG_XKBCOMMON"
  # currently only xcb platform plugin supports building xkbcommon
  if [ "$CFG_XCB" != "no" ]; then
-diff -ur qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.cpp qtbase-opensource-src-5.3.2-old_xkbcommon/src/plugins/platforms/xcb/qxcbkeyboard.cpp
---- qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.cpp	2014-10-08 19:46:02.000000000 +0200
-+++ qtbase-opensource-src-5.3.2-old_xkbcommon/src/plugins/platforms/xcb/qxcbkeyboard.cpp	2014-10-08 19:42:46.000000000 +0200
-@@ -871,7 +871,7 @@
-         return QList<int>();
- 
-     QList<int> result;
--    int baseQtKey = keysymToQtKey(sym, modifiers, lookupString(kb_state, event->nativeScanCode()));
-+    int baseQtKey = keysymToQtKey(sym, modifiers, keysymToUnicode(sym));
-     result += (baseQtKey + modifiers); // The base key is _always_ valid, of course
- 
-     xkb_mod_index_t shiftMod = xkb_keymap_mod_get_index(xkb_keymap, "Shift");
-@@ -918,7 +918,7 @@
+     if [ "$CFG_XKBCOMMON" != "no" ] && [ "$CFG_XKBCOMMON" != "qt" ]; then
+diff -up qtbase-opensource-src-5.4.0-beta/src/plugins/platforms/xcb/qxcbkeyboard.cpp.old_xkbcommon qtbase-opensource-src-5.4.0-beta/src/plugins/platforms/xcb/qxcbkeyboard.cpp
+--- qtbase-opensource-src-5.4.0-beta/src/plugins/platforms/xcb/qxcbkeyboard.cpp.old_xkbcommon	2014-10-30 14:22:00.383881294 -0500
++++ qtbase-opensource-src-5.4.0-beta/src/plugins/platforms/xcb/qxcbkeyboard.cpp	2014-10-30 14:22:00.390881222 -0500
+@@ -916,7 +916,7 @@ QList<int> QXcbKeyboard::possibleKeys(co
                  continue;
  
              Qt::KeyboardModifiers mods = modifiers & ~neededMods;
@@ -31,7 +22,7 @@ diff -ur qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeybo
  
              if (qtKey == baseQtKey)
                  continue;
-@@ -1363,7 +1363,7 @@
+@@ -1361,7 +1361,7 @@ void QXcbKeyboard::handleKeyEvent(xcb_wi
  
      Qt::KeyboardModifiers modifiers = translateModifiers(state);
  
@@ -40,7 +31,7 @@ diff -ur qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeybo
      int count = string.size();
      string.truncate(count);
  
-@@ -1427,12 +1427,18 @@
+@@ -1425,12 +1425,18 @@ void QXcbKeyboard::handleKeyEvent(xcb_wi
      }
  }
  
@@ -63,10 +54,10 @@ diff -ur qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeybo
      return QString::fromUtf8(chars);
  }
  
-diff -ur qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.h qtbase-opensource-src-5.3.2-old_xkbcommon/src/plugins/platforms/xcb/qxcbkeyboard.h
---- qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.h	2014-10-08 19:46:02.000000000 +0200
-+++ qtbase-opensource-src-5.3.2-old_xkbcommon/src/plugins/platforms/xcb/qxcbkeyboard.h	2014-10-08 19:42:46.000000000 +0200
-@@ -83,7 +83,7 @@
+diff -up qtbase-opensource-src-5.4.0-beta/src/plugins/platforms/xcb/qxcbkeyboard.h.old_xkbcommon qtbase-opensource-src-5.4.0-beta/src/plugins/platforms/xcb/qxcbkeyboard.h
+--- qtbase-opensource-src-5.4.0-beta/src/plugins/platforms/xcb/qxcbkeyboard.h.old_xkbcommon	2014-10-30 14:22:00.383881294 -0500
++++ qtbase-opensource-src-5.4.0-beta/src/plugins/platforms/xcb/qxcbkeyboard.h	2014-10-30 14:22:00.390881222 -0500
+@@ -75,7 +75,7 @@ protected:
      void handleKeyEvent(xcb_window_t sourceWindow, QEvent::Type type, xcb_keycode_t code, quint16 state, xcb_timestamp_t time);
  
      void resolveMaskConflicts();
