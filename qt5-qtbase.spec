@@ -32,7 +32,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 0.2.%{pre}%{?dist}
+Release: 0.3.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -79,7 +79,8 @@ Patch50: qt5-poll.patch
 
 ##upstream patches
 
-# macros
+# macros, be mindful to keep sync'd with macros.qt5
+Source1: macros.qt5
 %define _qt5 %{name}
 %define _qt5_prefix %{_libdir}/qt5
 %define _qt5_archdatadir %{_libdir}/qt5
@@ -426,28 +427,14 @@ Version: %{version}
 EOF
 
 # rpm macros
-mkdir -p %{buildroot}%{rpm_macros_dir}
-cat >%{buildroot}%{rpm_macros_dir}/macros.qt5<<EOF
-%%_qt5 %{name}
-%%_qt5_epoch %{?epoch}%{!?epoch:0}
-%%_qt5_version %{version}
-%%_qt5_evr %{?epoch:%{epoch:}}%{version}-%{release}
-%%_qt5_prefix %%{_libdir}/qt5
-%%_qt5_archdatadir %%{_qt5_prefix}
-%%_qt5_bindir %%{_qt5_prefix}/bin
-%%_qt5_datadir %%{_datadir}/qt5
-%%_qt5_docdir %%{_docdir}/qt5
-%%_qt5_examplesdir %%{_qt5_prefix}/examples
-%%_qt5_headerdir %%{_includedir}/qt5
-%%_qt5_importdir %%{_qt5_archdatadir}/imports
-%%_qt5_libdir %%{_libdir}
-%%_qt5_libexecdir %%{_qt5_archdatadir}/libexec
-%%_qt5_plugindir %%{_qt5_archdatadir}/plugins
-%%_qt5_qmake %%{_qt5_bindir}/qmake
-%%_qt5_settingsdir %%{_sysconfdir}/xdg
-%%_qt5_sysconfdir %%{_qt5_settingsdir}
-%%_qt5_translationdir %%{_datadir}/qt5/translations
-EOF
+install -p -m644 -D %{SOURCE1} \
+  %{buildroot}%{rpm_macros_dir}/macros.qt5
+sed -i \
+  -e "s|@@NAME@@|%{name}|g" \
+  -e "s|@@EPOCH@@|%{?epoch}%{!?epoch:0}|g" \
+  -e "s|@@VERSION@@|%{version}|g" \
+  -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
+  %{buildroot}%{rpm_macros_dir}/macros.qt5
 
 # create/own dirs
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/iconengines,%{_qt5_translationdir}}
@@ -806,6 +793,9 @@ fi
 
 
 %changelog
+* Mon Nov 03 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.3.beta
+- macros.qt5: +%%qmake_qt5 , to help set standard build flags (CFLAGS, etc...)
+
 * Wed Oct 22 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.4.0-0.2.beta
 - -gui: don't require gtk2 (__requires_exclude_from platformthemes) (#1154884)
 
