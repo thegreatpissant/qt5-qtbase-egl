@@ -1,0 +1,10 @@
+--- qtbase-opensource-src-5.3.2-ori/src/plugins/platforms/xcb/qxcbintegration.cpp	2014-09-11 12:48:06.000000000 +0200
++++ qtbase-opensource-src-5.3.2/src/plugins/platforms/xcb/qxcbintegration.cpp	2014-10-19 01:21:48.115307241 +0200
+@@ -404,6 +404,7 @@ QVariant QXcbIntegration::styleHint(QPla
+     case QPlatformIntegration::KeyboardAutoRepeatRate:
+     case QPlatformIntegration::PasswordMaskDelay:
+     case QPlatformIntegration::FontSmoothingGamma:
++        return qreal(1.4);
+     case QPlatformIntegration::StartDragVelocity:
+     case QPlatformIntegration::UseRtlExtensions:
+     case QPlatformIntegration::PasswordMaskCharacter:
