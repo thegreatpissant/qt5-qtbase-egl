@@ -32,7 +32,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 0.5.%{pre}%{?dist}
+Release: 0.6.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -147,6 +147,8 @@ BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 %if 0%{?fedora} > 19
 # Fedora 20
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
+%global xkbcommon_version %(pkg-config --modversion xkbcommon 2> /dev/null || echo '0.4.1')
+Requires: libxkbcommon%{?_isa} >= %{xkbcommon_version}
 %else
 # Fedora 19 and older
 BuildRequires: pkgconfig(xkbcommon)
@@ -799,6 +801,9 @@ fi
 
 
 %changelog
+* Wed Nov 12 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.6.beta
+- add versioned Requires: libxkbcommon dep
+
 * Tue Nov 11 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.5.beta
 - pull in slightly different upstreamed font rendering fix (#1052389,QTBUG-41590)
 
