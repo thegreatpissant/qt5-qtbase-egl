@@ -29,7 +29,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.3.2
-Release: 4%{?dist}
+Release: 4%{?dist}.1
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -142,6 +142,8 @@ BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
 %if 0%{?fedora} > 19
 # Fedora 20
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
+%global xkbcommon_version %(pkg-config --modversion xkbcommon 2> /dev/null || echo '0.4.1')
+Requires: libxkbcommon%{?_isa} >= %{xkbcommon_version}
 %else
 # Fedora 19 and older
 BuildRequires: pkgconfig(xkbcommon)
@@ -768,6 +770,9 @@ fi
 
 
 %changelog
+* Wed Nov 12 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-4.1
+- add versioned Requires: libxkbcommon dep
+
 * Thu Oct 23 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.3.2-4
 - -gui: don't require gtk2 (__requires_exclude_from platformthemes) (#1154884)
 
