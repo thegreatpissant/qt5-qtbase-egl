@@ -32,7 +32,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 0.7.%{pre}%{?dist}
+Release: 0.8.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -78,6 +78,11 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 Patch50: qt5-poll.patch
 
 ## upstream patches
+
+# Bad font rendering, http://bugzilla.redhat.com/1052389
+# tweak font gamma correction, from:
+# https://bugreports.qt-project.org/browse/QTBUG-41590
+Patch109: 0009-Do-not-apply-subpixel-gamma-correction-on-XCB.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -309,6 +314,8 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch50 -p1 -b .poll
+
+%patch109 -p1 -b .0009
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -795,6 +802,9 @@ fi
 
 
 %changelog
+* Fri Nov 28 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.8.rc
+- restore font rendering patch (#1052389,QTBUG-41590)
+
 * Thu Nov 27 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.7.rc
 - 5.4.0-rc
 
