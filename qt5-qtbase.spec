@@ -25,14 +25,14 @@
 %define examples 1
 %endif
 
-%define pre beta
+%define pre rc
 #define snap 2014-10-07_40
 #define snap_tag 20141007_40
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 0.6.%{pre}%{?dist}
+Release: 0.7.%{pre}%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -78,11 +78,6 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 Patch50: qt5-poll.patch
 
 ## upstream patches
-
-# Bad font rendering, http://bugzilla.redhat.com/1052389
-# tweak font gamma correction, from:
-# https://bugreports.qt-project.org/browse/QTBUG-41590
-Patch351: 0351-Do-not-apply-subpixel-gamma-correction-on-XCB.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -314,7 +309,6 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch50 -p1 -b .poll
-%patch351 -p1 -b .0351
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -801,6 +795,9 @@ fi
 
 
 %changelog
+* Thu Nov 27 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.7.rc
+- 5.4.0-rc
+
 * Wed Nov 12 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.6.beta
 - add versioned Requires: libxkbcommon dep
 
