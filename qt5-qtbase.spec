@@ -18,7 +18,8 @@
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
-%if ! 0%{?bootstrap}
+# skip docs on el6, qdoc crashes: https://bugreports.qt-project.org/browse/QTBUG-43057
+%if ! 0%{?bootstrap} && ! 0%{?rhel} == 6
 %ifarch %{arm} %{ix86} x86_64
 %define docs 1
 %endif
