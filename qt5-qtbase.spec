@@ -84,6 +84,7 @@ Patch50: qt5-poll.patch
 # tweak font gamma correction, from:
 # https://bugreports.qt-project.org/browse/QTBUG-41590
 Patch109: 0009-Do-not-apply-subpixel-gamma-correction-on-XCB.patch
+Patch273: 0173-qimage_conversions.cpp-Fix-build-on-big-endian-syste.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -317,6 +318,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 #patch50 -p1 -b .poll
 
 %patch109 -p1 -b .0009
+%patch273 -p1 -b .0173
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
