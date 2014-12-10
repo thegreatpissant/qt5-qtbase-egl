@@ -19,7 +19,7 @@
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
 # skip docs on el6, qdoc crashes: https://bugreports.qt-project.org/browse/QTBUG-43057
-%if ! 0%{?bootstrap} && ! 0%{?rhel} == 6
+%if ! 0%{?bootstrap} && 0%{?rhel} != 6
 %ifarch %{arm} %{ix86} x86_64
 %define docs 1
 %endif
@@ -33,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -803,6 +803,9 @@ fi
 
 
 %changelog
+* Wed Dec 10 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-2
+- fix bootstrapping logic
+
 * Wed Dec 10 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-1
 - 5.4.0 (final)
 
