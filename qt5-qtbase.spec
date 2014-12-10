@@ -26,14 +26,14 @@
 %define examples 1
 %endif
 
-%define pre rc
+#define pre rc
 #define snap 2014-10-07_40
 #define snap_tag 20141007_40
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 0.8.%{pre}%{?dist}
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -803,6 +803,9 @@ fi
 
 
 %changelog
+* Wed Dec 10 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-1
+- 5.4.0 (final)
+
 * Fri Nov 28 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.8.rc
 - restore font rendering patch (#1052389,QTBUG-41590)
 
