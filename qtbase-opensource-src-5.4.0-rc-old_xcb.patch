@@ -1,7 +1,7 @@
-diff -ur qtbase-opensource-src-5.3.2/configure qtbase-opensource-src-5.3.2-old_xcb/configure
---- qtbase-opensource-src-5.3.2/configure	2014-09-11 12:47:55.000000000 +0200
-+++ qtbase-opensource-src-5.3.2-old_xcb/configure	2014-10-08 19:46:02.000000000 +0200
-@@ -4982,10 +4982,8 @@
+diff -ur qtbase-opensource-src-5.4.0-rc/configure qtbase-opensource-src-5.4.0-rc-old_xcb/configure
+--- qtbase-opensource-src-5.4.0-rc/configure	2014-11-24 15:59:27.000000000 +0100
++++ qtbase-opensource-src-5.4.0-rc-old_xcb/configure	2014-11-29 03:07:40.000000000 +0100
+@@ -5041,10 +5041,8 @@
                  QMAKE_LIBS_XCB="`$PKG_CONFIG --libs $XCB_PACKAGES 2>/dev/null`"
              fi
  
@@ -13,10 +13,10 @@ diff -ur qtbase-opensource-src-5.3.2/configure qtbase-opensource-src-5.3.2-old_x
                  QMAKE_CFLAGS_XKB="`$PKG_CONFIG --cflags xcb xcb-xkb 2>/dev/null`"
                  QMAKE_LIBS_XKB="`$PKG_CONFIG --libs xcb xcb-xkb 2>/dev/null`"
                  if compileTest qpa/xcb-xkb "xcb-xkb" $QMAKE_CFLAGS_XKB $QMAKE_LIBS_XKB; then
-@@ -5092,9 +5090,9 @@
- # currently only xcb platform plugin supports building xkbcommon
+@@ -5151,16 +5149,16 @@
  if [ "$CFG_XCB" != "no" ]; then
-     if [ "$CFG_XKBCOMMON" = "auto" ] || [ "$CFG_XKBCOMMON" = "system" ]; then
+     if [ "$CFG_XKBCOMMON" != "no" ] && [ "$CFG_XKBCOMMON" != "qt" ]; then
+         # Check if there is a suitable system-wide xkbcommon
 -        if [ -n "$PKG_CONFIG" ] && $PKG_CONFIG --exists "xkbcommon xkbcommon-x11 >= $MIN_REQ_XKBCOMMON" 2>/dev/null; then
 -            QMAKE_CFLAGS_XKBCOMMON="`$PKG_CONFIG --cflags xkbcommon xkbcommon-x11 2>/dev/null`"
 -            QMAKE_LIBS_XKBCOMMON="`$PKG_CONFIG --libs xkbcommon xkbcommon-x11 2>/dev/null`"
@@ -26,19 +26,19 @@ diff -ur qtbase-opensource-src-5.3.2/configure qtbase-opensource-src-5.3.2-old_x
  
              QMakeVar set QMAKE_CFLAGS_XKBCOMMON "$QMAKE_CFLAGS_XKBCOMMON"
              QMakeVar set QMAKE_LIBS_XKBCOMMON "$QMAKE_LIBS_XKBCOMMON"
-@@ -6588,7 +6586,7 @@
-     echo
- fi
- if [ "$ORIG_CFG_XKBCOMMON" != qt ] && [ "$CFG_XKBCOMMON" = qt ]; then
--    echo "NOTE: libxkbcommon and libxkbcommon-x11 $MIN_REQ_XKBCOMMON or higher not found on the system, will use "
-+    echo "NOTE: libxkbcommon $MIN_REQ_XKBCOMMON or higher not found on the system, will use "
-     echo "the bundled version from 3rd party directory."
- fi
- if [ "$CFG_XKBCOMMON" = "qt" ] && [ "$CFG_XKB_CONFIG_ROOT" = "not found" ]; then
-diff -ur qtbase-opensource-src-5.3.2/src/plugins/platforms/xcb/qxcbconnection.cpp qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbconnection.cpp
---- qtbase-opensource-src-5.3.2/src/plugins/platforms/xcb/qxcbconnection.cpp	2014-09-11 12:48:06.000000000 +0200
-+++ qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbconnection.cpp	2014-10-08 19:46:02.000000000 +0200
-@@ -1710,7 +1710,7 @@
+             CFG_XKBCOMMON=system
+         elif [ "$CFG_XKBCOMMON" = "system" ] && [ "$CFG_CONFIGURE_EXIT_ON_ERROR" = "yes" ]; then
+-            echo " xkbcommon support cannot be enabled because either xkbcommon or "
+-            echo " xkbcommon-x11 >= $MIN_REQ_XKBCOMMON was not found via pkg-config!"
++            echo " xkbcommon support cannot be enabled because xkbcommon"
++            echo " >= $MIN_REQ_XKBCOMMON was not found via pkg-config!"
+             echo " Turn on verbose messaging (-v) to $0 to see the final report."
+             echo " If you believe this message is in error you may use the continue"
+             echo " switch (-continue) to $0 to continue."
+diff -ur qtbase-opensource-src-5.4.0-rc/src/plugins/platforms/xcb/qxcbconnection.cpp qtbase-opensource-src-5.4.0-rc-old_xcb/src/plugins/platforms/xcb/qxcbconnection.cpp
+--- qtbase-opensource-src-5.4.0-rc/src/plugins/platforms/xcb/qxcbconnection.cpp	2014-11-24 16:00:12.000000000 +0100
++++ qtbase-opensource-src-5.4.0-rc-old_xcb/src/plugins/platforms/xcb/qxcbconnection.cpp	2014-11-29 03:07:40.000000000 +0100
+@@ -1761,7 +1761,7 @@
      xcb_xkb_use_extension_cookie_t xkb_query_cookie;
      xcb_xkb_use_extension_reply_t *xkb_query;
  
@@ -47,10 +47,10 @@ diff -ur qtbase-opensource-src-5.3.2/src/plugins/platforms/xcb/qxcbconnection.cp
      xkb_query = xcb_xkb_use_extension_reply(c, xkb_query_cookie, 0);
  
      if (!xkb_query) {
-diff -ur qtbase-opensource-src-5.3.2/src/plugins/platforms/xcb/qxcbkeyboard.cpp qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.cpp
---- qtbase-opensource-src-5.3.2/src/plugins/platforms/xcb/qxcbkeyboard.cpp	2014-09-11 12:48:06.000000000 +0200
-+++ qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.cpp	2014-10-08 19:46:02.000000000 +0200
-@@ -697,50 +697,65 @@
+diff -ur qtbase-opensource-src-5.4.0-rc/src/plugins/platforms/xcb/qxcbkeyboard.cpp qtbase-opensource-src-5.4.0-rc-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.cpp
+--- qtbase-opensource-src-5.4.0-rc/src/plugins/platforms/xcb/qxcbkeyboard.cpp	2014-11-24 16:00:11.000000000 +0100
++++ qtbase-opensource-src-5.4.0-rc-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.cpp	2014-11-29 03:29:53.000000000 +0100
+@@ -693,50 +693,65 @@
          // log only critical errors, we do our own error logging from printKeymapError()
          xkb_context_set_log_level(xkb_context, (xkb_log_level)XKB_LOG_LEVEL_CRITICAL);
      }
@@ -92,7 +92,7 @@ diff -ur qtbase-opensource-src-5.3.2/src/plugins/platforms/xcb/qxcbkeyboard.cpp 
 -        if (xkb_keymap) {
 -            new_state = xkb_state_new(xkb_keymap);
 -        } else {
--            printKeymapError("Failed to compile a keymap!");
+-            printKeymapError("Qt: Failed to compile a keymap!");
 -            m_config = false;
 -            return;
 -        }
@@ -148,10 +148,10 @@ diff -ur qtbase-opensource-src-5.3.2/src/plugins/platforms/xcb/qxcbkeyboard.cpp 
 +#endif
 +            updateXKBMods();
 +    }
- }
  
- #ifndef QT_NO_XKB
-@@ -995,11 +1010,23 @@
+     checkForLatinLayout();
+ }
+@@ -1096,11 +1111,23 @@
      if (connection->hasXKB()) {
          updateVModMapping();
          updateVModToRModMapping();
@@ -177,10 +177,10 @@ diff -ur qtbase-opensource-src-5.3.2/src/plugins/platforms/xcb/qxcbkeyboard.cpp 
      } else {
  #endif
          m_key_symbols = xcb_key_symbols_alloc(xcb_connection());
-diff -ur qtbase-opensource-src-5.3.2/src/plugins/platforms/xcb/qxcbkeyboard.h qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.h
---- qtbase-opensource-src-5.3.2/src/plugins/platforms/xcb/qxcbkeyboard.h	2014-09-11 12:48:06.000000000 +0200
-+++ qtbase-opensource-src-5.3.2-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.h	2014-10-08 19:46:02.000000000 +0200
-@@ -47,9 +47,6 @@
+diff -ur qtbase-opensource-src-5.4.0-rc/src/plugins/platforms/xcb/qxcbkeyboard.h qtbase-opensource-src-5.4.0-rc-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.h
+--- qtbase-opensource-src-5.4.0-rc/src/plugins/platforms/xcb/qxcbkeyboard.h	2014-11-24 16:00:12.000000000 +0100
++++ qtbase-opensource-src-5.4.0-rc-old_xcb/src/plugins/platforms/xcb/qxcbkeyboard.h	2014-11-29 03:07:40.000000000 +0100
+@@ -39,9 +39,6 @@
  #include <xcb/xcb_keysyms.h>
  
  #include <xkbcommon/xkbcommon.h>
