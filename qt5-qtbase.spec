@@ -23,8 +23,9 @@
 %ifarch %{arm} %{ix86} x86_64
 %define docs 1
 %endif
-%define examples 1
 %endif
+
+%define examples 1
 
 #define pre rc
 #define snap 2014-10-07_40
@@ -33,7 +34,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -805,6 +806,9 @@ fi
 
 
 %changelog
+* Thu Dec 11 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-3
+- don't omit examples for bootstrap (needs work)
+
 * Wed Dec 10 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-2
 - fix bootstrapping logic
 
