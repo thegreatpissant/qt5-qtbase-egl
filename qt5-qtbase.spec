@@ -18,8 +18,7 @@
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
-# skip docs on el6, qdoc crashes: https://bugreports.qt-project.org/browse/QTBUG-43057
-%if ! 0%{?bootstrap} && 0%{?rhel} != 6
+%if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64
 %define docs 1
 %endif
@@ -34,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -80,6 +79,9 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 Patch50: qt5-poll.patch
 
 ## upstream patches
+# workaround https://bugreports.qt-project.org/browse/QTBUG-43057
+# 'make docs' crash on el6, use qSort instead of std::sort
+Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
 # Bad font rendering, http://bugzilla.redhat.com/1052389
 # tweak font gamma correction, from:
@@ -317,6 +319,10 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch50 -p1 -b .poll
+
+%if 0%{?rhel} == 6
+%patch100 -p1 -b .QTBUG-43057
+%endif
 
 %patch109 -p1 -b .0009
 %patch273 -p1 -b .0173
@@ -806,6 +812,9 @@ fi
 
 
 %changelog
+* Wed Dec 17 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-4
+- workaround 'make docs' crasher on el6 (QTBUG-43057)
+
 * Thu Dec 11 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-3
 - don't omit examples for bootstrap (needs work)
 
