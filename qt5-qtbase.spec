@@ -33,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -484,10 +484,10 @@ popd
 %if 0%{?qtchooser}
   mkdir -p %{buildroot}%{_sysconfdir}/xdg/qtchooser
   pushd    %{buildroot}%{_sysconfdir}/xdg/qtchooser
-  echo "%{_qt5_bindir}" >  qt5-%{__isa_bits}.conf
-  echo "%{_qt5_prefix}" >> qt5-%{__isa_bits}.conf
+  echo "%{_qt5_bindir}" >  5-%{__isa_bits}.conf
+  echo "%{_qt5_prefix}" >> 5-%{__isa_bits}.conf
   # alternatives targets
-  touch default.conf qt5.conf
+  touch default.conf 5.conf
   popd
 %endif
 
@@ -519,19 +519,31 @@ ctest --output-on-failure ||:
 popd
 
 
+%if 0%{?qtchooser}
+%pre
+# remove short-lived qt5.conf alternatives
+%{_sbindir}/update-alternatives  \
+  --remove qtchooser-qt5 \
+  %{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf
+
+%{_sbindir}/update-alternatives  \
+  --remove qtchooser-default \
+  %{_sysconfdir}/xdg/qtchooser/qt5.conf
+%endif
+
 %post
 /sbin/ldconfig
 %if 0%{?qtchooser}
 %{_sbindir}/update-alternatives \
-  --install %{_sysconfdir}/xdg/qtchooser/qt5.conf \
-  qtchooser-qt5 \
-  %{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf \
+  --install %{_sysconfdir}/xdg/qtchooser/5.conf \
+  qtchooser-5 \
+  %{_sysconfdir}/xdg/qtchooser/5-%{__isa_bits}.conf \
   %{priority}
 
 %{_sbindir}/update-alternatives \
   --install %{_sysconfdir}/xdg/qtchooser/default.conf \
   qtchooser-default \
-  %{_sysconfdir}/xdg/qtchooser/qt5.conf \
+  %{_sysconfdir}/xdg/qtchooser/5.conf \
   %{priority}
 %endif
 
@@ -540,12 +552,12 @@ popd
 %if 0%{?qtchooser}
 if [ $1 -eq 0 ]; then
 %{_sbindir}/update-alternatives  \
-  --remove qtchooser-qt5 \
-  %{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf
+  --remove qtchooser-5 \
+  %{_sysconfdir}/xdg/qtchooser/5-%{__isa_bits}.conf
 
 %{_sbindir}/update-alternatives  \
   --remove qtchooser-default \
-  %{_sysconfdir}/xdg/qtchooser/qt5.conf
+  %{_sysconfdir}/xdg/qtchooser/5.conf
 fi
 %endif
 
@@ -812,6 +824,9 @@ fi
 
 
 %changelog
+* Sat Jan 17 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-5
+- ship /etc/xdg/qtchooser/5.conf alternative instead (of qt5.conf)
+
 * Wed Dec 17 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-4
 - workaround 'make docs' crasher on el6 (QTBUG-43057)
 
