@@ -568,8 +568,8 @@ fi
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
 %ghost %{_sysconfdir}/xdg/qtchooser/default.conf
-%ghost %{_sysconfdir}/xdg/qtchooser/qt5.conf
-%{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf
+%ghost %{_sysconfdir}/xdg/qtchooser/5.conf
+%{_sysconfdir}/xdg/qtchooser/5-%{__isa_bits}.conf
 %endif
 %{_qt5_libdir}/libQt5Concurrent.so.5*
 %{_qt5_libdir}/libQt5Core.so.5*
