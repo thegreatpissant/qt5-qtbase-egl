@@ -33,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -521,15 +521,17 @@ popd
 
 %if 0%{?qtchooser}
 %pre
+if [ $1 -gt 1 ] ; then
 # remove short-lived qt5.conf alternatives
 %{_sbindir}/update-alternatives  \
   --remove qtchooser-qt5 \
-  %{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf
+  %{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf >& /dev/null ||:
 
 %{_sbindir}/update-alternatives  \
   --remove qtchooser-default \
-  %{_sysconfdir}/xdg/qtchooser/qt5.conf
+  %{_sysconfdir}/xdg/qtchooser/qt5.conf >& /dev/null ||:
 %endif
+fi
 
 %post
 /sbin/ldconfig
@@ -824,6 +826,9 @@ fi
 
 
 %changelog
+* Sun Jan 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-6
+- fix %%pre scriptlet
+
 * Sat Jan 17 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-5
 - ship /etc/xdg/qtchooser/5.conf alternative instead (of qt5.conf)
 
