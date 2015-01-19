@@ -18,13 +18,13 @@
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
-# skip docs on el6, qdoc crashes: https://bugreports.qt-project.org/browse/QTBUG-43057
-%if ! 0%{?bootstrap} && 0%{?rhel} != 6
+%if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64
 %define docs 1
 %endif
-%define examples 1
 %endif
+
+%define examples 1
 
 #define pre rc
 #define snap 2014-10-07_40
@@ -33,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 2%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -79,6 +79,9 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 Patch50: qt5-poll.patch
 
 ## upstream patches
+# workaround https://bugreports.qt-project.org/browse/QTBUG-43057
+# 'make docs' crash on el6, use qSort instead of std::sort
+Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
 # Bad font rendering, http://bugzilla.redhat.com/1052389
 # tweak font gamma correction, from:
@@ -317,6 +320,10 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 #patch50 -p1 -b .poll
 
+%if 0%{?rhel} == 6
+%patch100 -p1 -b .QTBUG-43057
+%endif
+
 %patch109 -p1 -b .0009
 %patch273 -p1 -b .0173
 
@@ -477,10 +484,10 @@ popd
 %if 0%{?qtchooser}
   mkdir -p %{buildroot}%{_sysconfdir}/xdg/qtchooser
   pushd    %{buildroot}%{_sysconfdir}/xdg/qtchooser
-  echo "%{_qt5_bindir}" >  qt5-%{__isa_bits}.conf
-  echo "%{_qt5_prefix}" >> qt5-%{__isa_bits}.conf
+  echo "%{_qt5_bindir}" >  5-%{__isa_bits}.conf
+  echo "%{_qt5_prefix}" >> 5-%{__isa_bits}.conf
   # alternatives targets
-  touch default.conf qt5.conf
+  touch default.conf 5.conf
   popd
 %endif
 
@@ -512,19 +519,33 @@ ctest --output-on-failure ||:
 popd
 
 
+%if 0%{?qtchooser}
+%pre
+if [ $1 -gt 1 ] ; then
+# remove short-lived qt5.conf alternatives
+%{_sbindir}/update-alternatives  \
+  --remove qtchooser-qt5 \
+  %{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf >& /dev/null ||:
+
+%{_sbindir}/update-alternatives  \
+  --remove qtchooser-default \
+  %{_sysconfdir}/xdg/qtchooser/qt5.conf >& /dev/null ||:
+%endif
+fi
+
 %post
 /sbin/ldconfig
 %if 0%{?qtchooser}
 %{_sbindir}/update-alternatives \
-  --install %{_sysconfdir}/xdg/qtchooser/qt5.conf \
-  qtchooser-qt5 \
-  %{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf \
+  --install %{_sysconfdir}/xdg/qtchooser/5.conf \
+  qtchooser-5 \
+  %{_sysconfdir}/xdg/qtchooser/5-%{__isa_bits}.conf \
   %{priority}
 
 %{_sbindir}/update-alternatives \
   --install %{_sysconfdir}/xdg/qtchooser/default.conf \
   qtchooser-default \
-  %{_sysconfdir}/xdg/qtchooser/qt5.conf \
+  %{_sysconfdir}/xdg/qtchooser/5.conf \
   %{priority}
 %endif
 
@@ -533,12 +554,12 @@ popd
 %if 0%{?qtchooser}
 if [ $1 -eq 0 ]; then
 %{_sbindir}/update-alternatives  \
-  --remove qtchooser-qt5 \
-  %{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf
+  --remove qtchooser-5 \
+  %{_sysconfdir}/xdg/qtchooser/5-%{__isa_bits}.conf
 
 %{_sbindir}/update-alternatives  \
   --remove qtchooser-default \
-  %{_sysconfdir}/xdg/qtchooser/qt5.conf
+  %{_sysconfdir}/xdg/qtchooser/5.conf
 fi
 %endif
 
@@ -549,8 +570,8 @@ fi
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
 %ghost %{_sysconfdir}/xdg/qtchooser/default.conf
-%ghost %{_sysconfdir}/xdg/qtchooser/qt5.conf
-%{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf
+%ghost %{_sysconfdir}/xdg/qtchooser/5.conf
+%{_sysconfdir}/xdg/qtchooser/5-%{__isa_bits}.conf
 %endif
 %{_qt5_libdir}/libQt5Concurrent.so.5*
 %{_qt5_libdir}/libQt5Core.so.5*
@@ -805,6 +826,18 @@ fi
 
 
 %changelog
+* Sun Jan 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-6
+- fix %%pre scriptlet
+
+* Sat Jan 17 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-5
+- ship /etc/xdg/qtchooser/5.conf alternative instead (of qt5.conf)
+
+* Wed Dec 17 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-4
+- workaround 'make docs' crasher on el6 (QTBUG-43057)
+
+* Thu Dec 11 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-3
+- don't omit examples for bootstrap (needs work)
+
 * Wed Dec 10 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-2
 - fix bootstrapping logic
 
