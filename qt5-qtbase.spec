@@ -33,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -826,6 +826,9 @@ fi
 
 
 %changelog
+* Mon Jan 26 2015 David Tardon <dtardon@redhat.com> - 5.4.0-7
+- rebuild for ICU 54.1
+
 * Sun Jan 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-6
 - fix %%pre scriptlet
 
