@@ -13,6 +13,8 @@
 
 %global qt_module qtbase
 
+%global bootstrap 1
+
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 # define to build docs, need to undef this for bootstrapping
