@@ -33,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -831,6 +831,9 @@ fi
 
 
 %changelog
+* Wed Feb 04 2015 Petr Machata <pmachata@redhat.com> - 5.4.0-10
+- Bump for rebuild.
+
 * Sat Jan 31 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-9
 - crashes when connecting/disconnecting displays (#1083664,QTBUG-42985)
 
