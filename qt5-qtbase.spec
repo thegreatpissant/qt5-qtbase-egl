@@ -13,8 +13,6 @@
 
 %global qt_module qtbase
 
-%global bootstrap 1
-
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 # define to build docs, need to undef this for bootstrapping
@@ -35,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -833,6 +831,9 @@ fi
 
 
 %changelog
+* Thu Feb 05 2015 David Tardon <dtardon@redhat.com> - 5.4.0-11
+- full build after ICU soname bump
+
 * Wed Feb 04 2015 Petr Machata <pmachata@redhat.com> - 5.4.0-10
 - Bump for rebuild.
 
