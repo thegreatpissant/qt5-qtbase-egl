@@ -33,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 11%{?dist}
+Release: 12%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -461,7 +461,7 @@ sed -i \
   %{buildroot}%{rpm_macros_dir}/macros.qt5
 
 # create/own dirs
-mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/iconengines,%{_qt5_translationdir}}
+mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
 
 # hardlink files to %{_bindir}, add -qt5 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
@@ -614,13 +614,17 @@ fi
 %{_qt5_libdir}/cmake/Qt5Network/Qt5Network_QGenericEnginePlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Network/Qt5Network_QNetworkManagerEnginePlugin.cmake
 #dir %{_qt5_plugindir}/accessible/
+%dir %{_qt5_plugindir}/designer/
 %dir %{_qt5_plugindir}/generic/
+%dir %{_qt5_plugindir}/iconengines/
 %dir %{_qt5_plugindir}/imageformats/
 %dir %{_qt5_plugindir}/platforminputcontexts/
 %dir %{_qt5_plugindir}/platforms/
 %dir %{_qt5_plugindir}/platformthemes/
 %dir %{_qt5_plugindir}/printsupport/
+%dir %{_qt5_plugindir}/script/
 %dir %{_qt5_plugindir}/sqldrivers/
+%dir %{_qt5_plugindir}/styles/
 %{_qt5_plugindir}/sqldrivers/libqsqlite.so
 %{_qt5_libdir}/cmake/Qt5Sql/Qt5Sql_QSQLiteDriverPlugin.cmake
 
@@ -831,6 +835,9 @@ fi
 
 
 %changelog
+* Thu Feb 12 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-12
+- own  %%{_qt5_plugindir}/{designer,iconengines,script,styles}
+
 * Thu Feb 05 2015 David Tardon <dtardon@redhat.com> - 5.4.0-11
 - full build after ICU soname bump
 
