@@ -33,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -206,6 +206,13 @@ Requires(postun): %{_sbindir}/update-alternatives
 %if 0%{?rhel}
 %define ibase -no-sql-ibase
 %define tds -no-sql-tds
+%endif
+
+# workaround gold linker bug by not using it
+# https://bugzilla.redhat.com/show_bug.cgi?id=1193044
+#https://sourceware.org/bugzilla/show_bug.cgi?id=16992
+%if 0%{?fedora} > 21
+%define use_gold_linker -no-use-gold-linker
 %endif
 
 %description 
@@ -407,7 +414,8 @@ popd
   %{?sqlite} \
   %{?tds} \
   %{?xkbcommon} \
-  -system-zlib
+  -system-zlib \
+  %{?use_gold_linker}
 
 make %{?_smp_mflags}
 
@@ -835,6 +843,9 @@ fi
 
 
 %changelog
+* Mon Feb 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-13
+- -no-use-gold-linker (f22+, #1193044)
+
 * Thu Feb 12 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-12
 - own  %%{_qt5_plugindir}/{designer,iconengines,script,styles}
 
