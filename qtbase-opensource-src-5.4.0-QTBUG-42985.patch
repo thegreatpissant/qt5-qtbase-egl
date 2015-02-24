@@ -286,7 +286,7 @@ index 5510c3b..c9600f0 100644
 
  QXcbConnection::QXcbConnection(QXcbNativeInterface *nativeInterface, bool canGrabServer, const char *displayName)
 diff --git a/src/plugins/platforms/xcb/qxcbwindow.cpp b/src/plugins/platforms/xcb/qxcbwindow.cpp
-index 0094278..ee6546e 100644
+index 0094278..44d33e1 100644
 --- a/src/plugins/platforms/xcb/qxcbwindow.cpp
 +++ b/src/plugins/platforms/xcb/qxcbwindow.cpp
 @@ -257,9 +257,7 @@ QXcbWindow::QXcbWindow(QWindow *window)
@@ -507,18 +507,17 @@ index 0094278..ee6546e 100644
          xcb_translate_coordinates_reply_t *reply = xcb_translate_coordinates_reply(xcb_connection(), cookie, NULL);
          if (reply) {
              pos.setX(reply->dst_x);
-@@ -1888,8 +1888,8 @@ void QXcbWindow::handleConfigureNotifyEvent(const xcb_configure_notify_event_t *
+@@ -1888,8 +1888,7 @@ void QXcbWindow::handleConfigureNotifyEvent(const xcb_configure_notify_event_t *
      QWindowSystemInterface::handleGeometryChange(window(), rect);
 
      QPlatformScreen *newScreen = screenForNativeGeometry(nativeRect);
 -    if (newScreen != m_screen) {
 -        m_screen = static_cast<QXcbScreen*>(newScreen);
 +    if (newScreen != screen()) {
-+        screen = static_cast<QXcbScreen*>(newScreen);
          QWindowSystemInterface::handleWindowScreenChanged(window(), newScreen->screen());
          int newDpr = devicePixelRatio();
          if (newDpr != dpr) {
-@@ -1933,7 +1933,7 @@ QPoint QXcbWindow::mapToGlobal(const QPoint &pos) const
+@@ -1933,7 +1932,7 @@ QPoint QXcbWindow::mapToGlobal(const QPoint &pos) const
      const int dpr = int(devicePixelRatio());
      QPoint ret;
      xcb_translate_coordinates_cookie_t cookie =
@@ -527,7 +526,7 @@ index 0094278..ee6546e 100644
                                    pos.x() * dpr, pos.y() * dpr);
      xcb_translate_coordinates_reply_t *reply =
          xcb_translate_coordinates_reply(xcb_connection(), cookie, NULL);
-@@ -1954,7 +1954,7 @@ QPoint QXcbWindow::mapFromGlobal(const QPoint &pos) const
+@@ -1954,7 +1953,7 @@ QPoint QXcbWindow::mapFromGlobal(const QPoint &pos) const
      const int dpr = int(devicePixelRatio());
      QPoint ret;
      xcb_translate_coordinates_cookie_t cookie =
@@ -536,7 +535,7 @@ index 0094278..ee6546e 100644
                                    pos.x() *dpr, pos.y() * dpr);
      xcb_translate_coordinates_reply_t *reply =
          xcb_translate_coordinates_reply(xcb_connection(), cookie, NULL);
-@@ -2178,8 +2178,8 @@ void QXcbWindow::handlePropertyNotifyEvent(const xcb_property_notify_event_t *ev
+@@ -2178,8 +2177,8 @@ void QXcbWindow::handlePropertyNotifyEvent(const xcb_property_notify_event_t *ev
              m_windowState = newState;
          }
          return;
@@ -547,7 +546,7 @@ index 0094278..ee6546e 100644
      }
  }
 
-@@ -2308,7 +2308,7 @@ bool QXcbWindow::startSystemResize(const QPoint &pos, Qt::Corner corner)
+@@ -2308,7 +2307,7 @@ bool QXcbWindow::startSystemResize(const QPoint &pos, Qt::Corner corner)
      xev.data.data32[3] = XCB_BUTTON_INDEX_1;
      xev.data.data32[4] = 0;
      xcb_ungrab_pointer(connection()->xcb_connection(), XCB_CURRENT_TIME);
@@ -556,7 +555,7 @@ index 0094278..ee6546e 100644
                     XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY,
                     (const char *)&xev);
      return true;
-@@ -2444,13 +2444,18 @@ void QXcbWindow::postSyncWindowRequest()
+@@ -2444,13 +2443,18 @@ void QXcbWindow::postSyncWindowRequest()
      if (!m_pendingSyncRequest) {
          QXcbSyncWindowRequest *e = new QXcbSyncWindowRequest(this);
          m_pendingSyncRequest = e;
