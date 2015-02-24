@@ -354,6 +354,11 @@ mv sqlite UNUSED/
 popd
 
 
+# builds failing mysteriously on f20
+# ./configure: Permission denied
+# check to ensure that can't happen -- rex
+test -x configure || chmod +x configure
+
 %build
 
 # limit -reduce-relocations to %%ix86 x86_64 archs, https://bugreports.qt-project.org/browse/QTBUG-36129
