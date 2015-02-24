@@ -286,7 +286,7 @@ index 5510c3b..c9600f0 100644
 
  QXcbConnection::QXcbConnection(QXcbNativeInterface *nativeInterface, bool canGrabServer, const char *displayName)
 diff --git a/src/plugins/platforms/xcb/qxcbwindow.cpp b/src/plugins/platforms/xcb/qxcbwindow.cpp
-index 0094278..d17aa7d 100644
+index 0094278..ee6546e 100644
 --- a/src/plugins/platforms/xcb/qxcbwindow.cpp
 +++ b/src/plugins/platforms/xcb/qxcbwindow.cpp
 @@ -257,9 +257,7 @@ QXcbWindow::QXcbWindow(QWindow *window)
@@ -507,15 +507,17 @@ index 0094278..d17aa7d 100644
          xcb_translate_coordinates_reply_t *reply = xcb_translate_coordinates_reply(xcb_connection(), cookie, NULL);
          if (reply) {
              pos.setX(reply->dst_x);
-@@ -1888,7 +1888,7 @@ void QXcbWindow::handleConfigureNotifyEvent(const xcb_configure_notify_event_t *
+@@ -1888,8 +1888,8 @@ void QXcbWindow::handleConfigureNotifyEvent(const xcb_configure_notify_event_t *
      QWindowSystemInterface::handleGeometryChange(window(), rect);
 
      QPlatformScreen *newScreen = screenForNativeGeometry(nativeRect);
 -    if (newScreen != m_screen) {
+-        m_screen = static_cast<QXcbScreen*>(newScreen);
 +    if (newScreen != screen()) {
-         m_screen = static_cast<QXcbScreen*>(newScreen);
++        screen = static_cast<QXcbScreen*>(newScreen);
          QWindowSystemInterface::handleWindowScreenChanged(window(), newScreen->screen());
          int newDpr = devicePixelRatio();
+         if (newDpr != dpr) {
 @@ -1933,7 +1933,7 @@ QPoint QXcbWindow::mapToGlobal(const QPoint &pos) const
      const int dpr = int(devicePixelRatio());
      QPoint ret;
