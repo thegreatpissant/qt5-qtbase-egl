@@ -32,8 +32,8 @@
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.4.0
-Release: 13%{?dist}
+Version: 5.4.1
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -87,12 +87,6 @@ Patch51: qtbase-opensource-src-5.4.0-QTBUG-42985.patch
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
-# Bad font rendering, http://bugzilla.redhat.com/1052389
-# tweak font gamma correction, from:
-# https://bugreports.qt-project.org/browse/QTBUG-41590
-Patch109: 0009-Do-not-apply-subpixel-gamma-correction-on-XCB.patch
-Patch273: 0173-qimage_conversions.cpp-Fix-build-on-big-endian-syste.patch
-
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
 %define _qt5 %{name}
@@ -107,12 +101,12 @@ Source1: macros.qt5
 %define _qt5_docdir %{_docdir}/qt5
 %define _qt5_examplesdir %{_qt5_prefix}/examples
 %define _qt5_headerdir %{_includedir}/qt5
-%define _qt5_importdir %{_qt5_archdatadir}/imports 
+%define _qt5_importdir %{_qt5_archdatadir}/imports
 %define _qt5_libdir %{_libdir}
 %define _qt5_libexecdir %{_qt5_archdatadir}/libexec
 %define _qt5_plugindir %{_qt5_archdatadir}/plugins
 %define _qt5_settingsdir %{_sysconfdir}/xdg
-%define _qt5_sysconfdir %{_qt5_settingsdir} 
+%define _qt5_sysconfdir %{_qt5_settingsdir}
 %define _qt5_translationdir %{_datadir}/qt5/translations
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
@@ -215,14 +209,14 @@ Requires(postun): %{_sbindir}/update-alternatives
 %define use_gold_linker -no-use-gold-linker
 %endif
 
-%description 
+%description
 Qt is a software toolkit for developing applications.
 
 This package contains base tools, like string, xml, and network
 handling.
 
 %package devel
-Summary: Development files for %{name} 
+Summary: Development files for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-gui%{?_isa}
 %if 0%{?egl}
@@ -250,13 +244,13 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %description examples
 %{summary}.
 
-%package static 
+%package static
 Summary: Static library files for %{name}
 Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 Requires: pkgconfig(fontconfig)
 Requires: pkgconfig(glib-2.0)
 Requires: pkgconfig(zlib)
-%description static 
+%description static
 %{summary}.
 
 %if "%{?ibase}" != "-no-sql-ibase"
@@ -272,21 +266,21 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 Summary: MySQL driver for Qt5's SQL classes
 BuildRequires: mysql-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
-%description mysql 
+%description mysql
 %{summary}.
 
-%package odbc 
+%package odbc
 Summary: ODBC driver for Qt5's SQL classes
 BuildRequires: unixODBC-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
-%description odbc 
+%description odbc
 %{summary}.
 
-%package postgresql 
+%package postgresql
 Summary: PostgreSQL driver for Qt5's SQL classes
 BuildRequires: postgresql-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
-%description postgresql 
+%description postgresql
 %{summary}.
 
 %if "%{?tds}" != "-no-sql-tds"
@@ -336,16 +330,13 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch100 -p1 -b .QTBUG-43057
 %endif
 
-%patch109 -p1 -b .0009
-%patch273 -p1 -b .0173
-
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
 
 %define platform linux-g++
 
 sed -i -e "s|-O2|$RPM_OPT_FLAGS|g" \
-  mkspecs/%{platform}/qmake.conf 
+  mkspecs/%{platform}/qmake.conf
 
 sed -i -e "s|^\(QMAKE_LFLAGS_RELEASE.*\)|\1 $RPM_LD_FLAGS|" \
   mkspecs/common/g++-unix.conf
@@ -776,11 +767,11 @@ fi
 %{_qt5_plugindir}/sqldrivers/libqsqlmysql.so
 %{_qt5_libdir}/cmake/Qt5Sql/Qt5Sql_QMYSQLDriverPlugin.cmake
 
-%files odbc 
+%files odbc
 %{_qt5_plugindir}/sqldrivers/libqsqlodbc.so
 %{_qt5_libdir}/cmake/Qt5Sql/Qt5Sql_QODBCDriverPlugin.cmake
 
-%files postgresql 
+%files postgresql
 %{_qt5_plugindir}/sqldrivers/libqsqlpsql.so
 %{_qt5_libdir}/cmake/Qt5Sql/Qt5Sql_QPSQLDriverPlugin.cmake
 
@@ -843,6 +834,9 @@ fi
 
 
 %changelog
+* Tue Feb 24 2015 Jan Grulich <jgrulich@redhat.com> 5.4.1-1
+- update to 5.4.1
+
 * Mon Feb 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-13
 - -no-use-gold-linker (f22+, #1193044)
 
@@ -1012,7 +1006,7 @@ fi
 - fix %%_qt5_examplesdir macro
 
 * Sat Jan 25 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-5
-- -examples subpkg 
+- -examples subpkg
 
 * Mon Jan 13 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.2.0-4
 - fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
@@ -1155,7 +1149,7 @@ fi
 - 5.0-rc2
 - initial try at putting non-conflicting binaries in %%_bindir
 
-* Thu Dec 06 2012 Rex Dieter <rdieter@fedoraproject.org> 5.0.0-0.3.rc1 
+* Thu Dec 06 2012 Rex Dieter <rdieter@fedoraproject.org> 5.0.0-0.3.rc1
 - 5.0-rc1
 
 * Wed Nov 28 2012 Rex Dieter <rdieter@fedoraproject.org> 5.0.0-0.2.beta2
@@ -1164,7 +1158,7 @@ fi
 * Mon Nov 19 2012 Rex Dieter <rdieter@fedoraproject.org> 5.0.0-0.1.beta2
 - %%build: -accessibility
 - macros.qt5: +%%_qt5_archdatadir +%%_qt5_settingsdir
-- pull in a couple more configure-related upstream patches 
+- pull in a couple more configure-related upstream patches
 
 * Wed Nov 14 2012 Rex Dieter <rdieter@fedoraproject.org> 5.0.0-0.0.beta2
 - first try
