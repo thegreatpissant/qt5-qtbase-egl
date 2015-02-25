@@ -15,6 +15,8 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
+%global bootstrap 1
+
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
@@ -33,7 +35,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -839,6 +841,9 @@ fi
 
 
 %changelog
+* Wed Feb 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-2
+- try bootstrap=1 (f23)
+
 * Tue Feb 24 2015 Jan Grulich <jgrulich@redhat.com> 5.4.1-1
 - update to 5.4.1
 
