@@ -37,7 +37,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -90,6 +90,14 @@ Patch51: qtbase-opensource-src-5.4.0-QTBUG-42985.patch
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
+
+Patch272: 0072-CMake-Fix-QObject-connect-failing-on-ARM.patch
+Patch294: 0094-Fix-Meta-.-shortcuts-on-XCB.patch
+Patch332: 0132-Call-ofono-nm-Registered-delayed-in-constructor-othe.patch
+Patch336: 0136-Make-sure-there-s-a-scene-before-using-it.patch
+# http://lists.qt-project.org/pipermail/announce/2015-February/000059.html
+# CVE-2015-0295
+Patch349: 0149-Fix-a-division-by-zero-when-processing-malformed-BMP.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -333,6 +341,12 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
 %endif
+
+%patch272 -p1 -b .0072
+%patch294 -p1 -b .0094
+%patch332 -p1 -b .0132
+%patch336 -p1 -b .0136
+%patch349 -p1 -b .0149
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -843,6 +857,10 @@ fi
 
 
 %changelog
+* Fri Feb 27 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.4.1-3
+- pull in handful of upstream fixes, particularly...
+- Fix a division by zero when processing malformed BMP files (QTBUG-44547, CVE-2015-0295)
+
 * Wed Feb 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-2
 - try bootstrap=1 (f23)
 
