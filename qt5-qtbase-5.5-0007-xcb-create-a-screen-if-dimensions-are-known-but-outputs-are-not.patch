@@ -1,0 +1,86 @@
+commit ebdf9916600f0b0cd4d25b538d1fd0fef6e89077
+Author: Shawn Rutledge <shawn.rutledge@digia.com>
+Date:   Tue Mar 10 17:09:31 2015 +0100
+
+    xcb: create a screen if dimensions are known but outputs are not
+    
+    This partially reverts 51ada7734ad780178ecced11e0dff454dfc2e5f2
+    because it's necessary to keep some scenarios with vnc and
+    remote X servers working.  When an application is starting,
+    if we don't find the xrandr outputs but we know the dimensions
+    of the screen, we should still be able to put windows onto that
+    screen; but when we already had known xrandr outputs and then they
+    were removed, that's the case where we want to stop rendering
+    (and have no screen instances) until the screen(s) are reattached.
+    
+    Task-number: QTBUG-31389
+    Task-number: QTBUG-40174
+    Task-number: QTBUG-42985
+    Change-Id: I13d0996ba6ece78c4ebcd2c3a59f1617c1c7f0fa
+    Reviewed-by: Uli Schlachter <psychon@znc.in>
+    Reviewed-by: Gatis Paeglis <gatis.paeglis@digia.com>
+    Reviewed-by: Laszlo Agocs <laszlo.agocs@theqtcompany.com>
+
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.cpp b/src/plugins/platforms/xcb/qxcbconnection.cpp
+index 523ae79..89a0083 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.cpp
++++ b/src/plugins/platforms/xcb/qxcbconnection.cpp
+@@ -270,9 +270,8 @@ void QXcbConnection::updateScreens(const xcb_randr_notify_event_t *event)
+ 
+             QXcbIntegration::instance()->destroyScreen(screen);
+ 
+-            // QTBUG-40174, QTBUG-42985: If there are no outputs, then there must be
+-            // no QScreen instances; a Qt application can survive this situation, and
+-            // start rendering again later when there is a screen again.
++            // QTBUG-40174, QTBUG-42985: If all screens are removed, wait
++            // and start rendering again later if a screen becomes available.
+ 
+         } else if (!screen && output.connection == XCB_RANDR_CONNECTION_CONNECTED) {
+             // New XRandR output is available and it's enabled
+@@ -332,13 +331,15 @@ void QXcbConnection::initializeScreens()
+ {
+     xcb_screen_iterator_t it = xcb_setup_roots_iterator(m_setup);
+     int xcbScreenNumber = 0;    // screen number in the xcb sense
+-    QXcbScreen* primaryScreen = NULL;
++    QXcbScreen* primaryScreen = Q_NULLPTR;
++    xcb_screen_t *xcbScreen = Q_NULLPTR;
++    bool hasOutputs = false;
+     while (it.rem) {
+         // Each "screen" in xcb terminology is a virtual desktop,
+         // potentially a collection of separate juxtaposed monitors.
+         // But we want a separate QScreen for each output (e.g. DVI-I-1, VGA-1, etc.)
+         // which will become virtual siblings.
+-        xcb_screen_t *xcbScreen = it.data;
++        xcbScreen = it.data;
+         QList<QPlatformScreen *> siblings;
+         int outputCount = 0;
+         int connectedOutputCount = 0;
+@@ -395,6 +396,7 @@ void QXcbConnection::initializeScreens()
+                         QXcbScreen *screen = createScreen(xcbScreenNumber, xcbScreen, outputs[i], output.data());
+                         siblings << screen;
+                         ++connectedOutputCount;
++                        hasOutputs = true;
+                         m_screens << screen;
+ 
+                         // There can be multiple outputs per screen, use either
+@@ -420,6 +422,20 @@ void QXcbConnection::initializeScreens()
+         ++xcbScreenNumber;
+     } // for each xcb screen
+ 
++    // If there's no randr extension, or there was some error above, or we found a
++    // screen which doesn't have outputs for some other reason (e.g. on VNC or ssh -X),
++    // but the dimensions are known anyway, and we don't already have any lingering
++    // (possibly disconnected) screens, then showing windows should be possible,
++    // so create one screen. (QTBUG-31389)
++    if (xcbScreen && !hasOutputs && xcbScreen->width_in_pixels > 0 && xcbScreen->height_in_pixels > 0 && m_screens.isEmpty()) {
++        QXcbScreen *screen = createScreen(0, xcbScreen, 0, Q_NULLPTR);
++        screen->setVirtualSiblings(QList<QPlatformScreen *>() << screen);
++        m_screens << screen;
++        primaryScreen = screen;
++        primaryScreen->setPrimary(true);
++        qCDebug(lcQpaScreen) << "found a screen with zero outputs" << screen;
++    }
++
+     // Ensure the primary screen is first in the list
+     if (primaryScreen) {
+         Q_ASSERT(!m_screens.isEmpty());

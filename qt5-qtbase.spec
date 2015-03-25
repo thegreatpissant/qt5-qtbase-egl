@@ -37,7 +37,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -82,14 +82,24 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 # NEEDS REBASE
 Patch50: qt5-poll.patch
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=1083664
-# https://bugreports.qt.io/browse/QTBUG-42985
-Patch51: qtbase-opensource-src-5.4.0-QTBUG-42985.patch
-
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
+
+# Qt 5.5 patches rebased on Qt 5.4.1 for better XCB screen integration
+# fixes screen-handling related crashes and massive performance improvement
+# QTBUG-31389, QTBUG-38326, QTBUG-32973, QTBUG-40174, QTBUG-42985, QTBUG-42985, QTBUG-44388
+# https://bugzilla.redhat.com/show_bug.cgi?id=1083664
+Patch200: qt5-qtbase-5.5-0000-add-function-for-qpa-plugins-to-explictly-destroy-qscreens.patch
+Patch201: qt5-qtbase-5.5-0001-have-xcb-windows-platform-integration-classes-keep-their-own-instance-pointer.patch
+Patch202: qt5-qtbase-5.5-0002-ensure-qguiapplicationprivate-screen_list-is-correctly-populated.patch
+Patch203: qt5-qtbase-5.5-0003-xcb-add-qt-qpa-screen-logging-category.patch
+Patch204: qt5-qtbase-5.5-0004-xcb-do-not-create-dummy-qscreen-when-there-are-no-outputs.patch
+Patch205: qt5-qtbase-5.5-0005-improve-handling-of-xrandr-events-in-xcb-backend.patch
+Patch206: qt5-qtbase-5.5-0006-fix-segfault-when-requesting-root-window-and-there-are-no-screens.patch
+Patch207: qt5-qtbase-5.5-0007-xcb-create-a-screen-if-dimensions-are-known-but-outputs-are-not.patch
+
 
 Patch272: 0072-CMake-Fix-QObject-connect-failing-on-ARM.patch
 Patch294: 0094-Fix-Meta-.-shortcuts-on-XCB.patch
@@ -336,11 +346,19 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch12 -p1 -b .enable_ft_lcdfilter
 
 #patch50 -p1 -b .poll
-%patch51 -p1 -b .QTBUG-42985
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
 %endif
+
+%patch200 -p1 -b .xcb0000
+%patch201 -p1 -b .xcb0001
+%patch202 -p1 -b .xcb0002
+%patch203 -p1 -b .xcb0003
+%patch204 -p1 -b .xcb0004
+%patch205 -p1 -b .xcb0005
+%patch206 -p1 -b .xcb0006
+%patch207 -p1 -b .xcb0007
 
 %patch272 -p1 -b .0072
 %patch294 -p1 -b .0094
@@ -857,6 +875,9 @@ fi
 
 
 %changelog
+* Wed Mar 25 2015 Daniel Vrátil <dvratil@redhat.com> - 5.4.1-4
+- pull in set of upstream Qt 5.5 fixes and improvements for XCB screen handling rebased to 5.4
+
 * Fri Feb 27 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.4.1-3
 - pull in handful of upstream fixes, particularly...
 - Fix a division by zero when processing malformed BMP files (QTBUG-44547, CVE-2015-0295)

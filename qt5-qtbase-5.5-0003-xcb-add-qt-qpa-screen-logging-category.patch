@@ -1,0 +1,250 @@
+commit bbdef3ca98ba78a829dc725ba67fe6d466e20f9c
+Author: Shawn Rutledge <shawn.rutledge@digia.com>
+Date:   Mon Feb 23 10:30:26 2015 +0100
+
+    xcb: add qt.qpa.screen logging category
+    
+    Some existing debug output required recompiling with Q_XCB_DEBUG.
+    Being able to enable this debugging in the field will help with
+    troubleshooting any remaining screen management issues.
+    
+    Change-Id: Ie67b0009d4b00b0d39fde0fb4d8d54fcf89d6693
+    Reviewed-by: Sandro Mani <manisandro@gmail.com>
+    Reviewed-by: Laszlo Agocs <laszlo.agocs@theqtcompany.com>
+    Reviewed-by: Jørgen Lind <jorgen.lind@theqtcompany.com>
+
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.cpp b/src/plugins/platforms/xcb/qxcbconnection.cpp
+index e416865..a8c1943 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.cpp
++++ b/src/plugins/platforms/xcb/qxcbconnection.cpp
+@@ -86,6 +86,7 @@ QT_BEGIN_NAMESPACE
+ 
+ Q_LOGGING_CATEGORY(lcQpaXInput, "qt.qpa.input")
+ Q_LOGGING_CATEGORY(lcQpaXInputDevices, "qt.qpa.input.devices")
++Q_LOGGING_CATEGORY(lcQpaScreen, "qt.qpa.screen")
+ 
+ #ifdef XCB_USE_XLIB
+ static const char * const xcbConnectionErrors[] = {
+@@ -224,15 +225,11 @@ void QXcbConnection::updateScreens()
+                         if (output == NULL)
+                             continue;
+ 
+-#ifdef Q_XCB_DEBUG
+-                        QString outputName = QString::fromUtf8((const char*)xcb_randr_get_output_info_name(output),
+-                                                               xcb_randr_get_output_info_name_length(output));
+-#endif
+ 
+                         if (output->crtc == XCB_NONE) {
+-#ifdef Q_XCB_DEBUG
+-                            qDebug("Screen output %s is not connected", qPrintable(outputName));
+-#endif
++                            qCDebug(lcQpaScreen, "output %s is not connected", qPrintable(
++                                        QString::fromUtf8((const char*)xcb_randr_get_output_info_name(output),
++                                                          xcb_randr_get_output_info_name_length(output))));
+                             continue;
+                         }
+ 
+@@ -248,9 +245,6 @@ void QXcbConnection::updateScreens()
+                             if (!primaryScreen || (primary && outputs[i] == primary->output)) {
+                                 primaryScreen = screen;
+                                 siblings.prepend(siblings.takeLast());
+-#ifdef Q_XCB_DEBUG
+-                                qDebug("Primary output is %d: %s", primary->output, qPrintable(outputName));
+-#endif
+                             }
+                         }
+                         free(output);
+@@ -263,9 +257,7 @@ void QXcbConnection::updateScreens()
+         // If there's no randr extension, or there was some error above, or the screen
+         // doesn't have outputs for some other reason (e.g. on VNC or ssh -X), just assume there is one screen.
+         if (connectedOutputCount == 0) {
+-#ifdef Q_XCB_DEBUG
+-                qDebug("Found a screen with zero outputs");
+-#endif
++            qCDebug(lcQpaScreen, "found a screen with zero outputs");
+             QXcbScreen *screen = findOrCreateScreen(newScreens, xcbScreenNumber, xcbScreen);
+             siblings << screen;
+             activeScreens << screen;
+@@ -298,18 +290,21 @@ void QXcbConnection::updateScreens()
+     if (newScreens.contains(primaryScreen)) {
+         newScreens.removeOne(primaryScreen);
+         m_screens.prepend(primaryScreen);
++        qCDebug(lcQpaScreen) << "adding as primary" << primaryScreen;
+         integration->screenAdded(primaryScreen, true);
+     }
+ 
+     // Add the remaining new screens
+     foreach (QXcbScreen* screen, newScreens) {
+         m_screens.append(screen);
++        qCDebug(lcQpaScreen) << "adding" << screen;
+         integration->screenAdded(screen);
+     }
+ 
+     // Delete the old screens, now that the new ones were added
+     // and we are sure that there is at least one screen available
+     foreach (QXcbScreen* screen, screensToDelete) {
++        qCDebug(lcQpaScreen) << "removing" << screen;
+         integration->destroyScreen(screen);
+     }
+ 
+@@ -323,6 +318,9 @@ void QXcbConnection::updateScreens()
+             m_screens.prepend(primaryScreen);
+         }
+     }
++
++    if (!m_screens.isEmpty())
++        qCDebug(lcQpaScreen) << "primary output is" << m_screens.first()->name();
+ }
+ 
+ QXcbConnection::QXcbConnection(QXcbNativeInterface *nativeInterface, bool canGrabServer, const char *displayName)
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.h b/src/plugins/platforms/xcb/qxcbconnection.h
+index 7286b6b..6e7e87d 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.h
++++ b/src/plugins/platforms/xcb/qxcbconnection.h
+@@ -76,6 +76,7 @@ QT_BEGIN_NAMESPACE
+ 
+ Q_DECLARE_LOGGING_CATEGORY(lcQpaXInput)
+ Q_DECLARE_LOGGING_CATEGORY(lcQpaXInputDevices)
++Q_DECLARE_LOGGING_CATEGORY(lcQpaScreen)
+ 
+ class QXcbScreen;
+ class QXcbWindow;
+diff --git a/src/plugins/platforms/xcb/qxcbintegration.cpp b/src/plugins/platforms/xcb/qxcbintegration.cpp
+index 050a9be..0b9fbbe 100644
+--- a/src/plugins/platforms/xcb/qxcbintegration.cpp
++++ b/src/plugins/platforms/xcb/qxcbintegration.cpp
+@@ -178,9 +178,7 @@ QXcbIntegration::QXcbIntegration(const QStringList &parameters, int &argc, char
+     m_connections << new QXcbConnection(m_nativeInterface.data(), m_canGrab, displayName);
+ 
+     for (int i = 0; i < parameters.size() - 1; i += 2) {
+-#ifdef Q_XCB_DEBUG
+-        qDebug() << "QXcbIntegration: Connecting to additional display: " << parameters.at(i) << parameters.at(i+1);
+-#endif
++        qCDebug(lcQpaScreen) << "connecting to additional display: " << parameters.at(i) << parameters.at(i+1);
+         QString display = parameters.at(i) + ':' + parameters.at(i+1);
+         m_connections << new QXcbConnection(m_nativeInterface.data(), display.toLatin1().constData());
+     }
+diff --git a/src/plugins/platforms/xcb/qxcbscreen.cpp b/src/plugins/platforms/xcb/qxcbscreen.cpp
+index 7136455..2aebb84 100644
+--- a/src/plugins/platforms/xcb/qxcbscreen.cpp
++++ b/src/plugins/platforms/xcb/qxcbscreen.cpp
+@@ -93,25 +93,6 @@ QXcbScreen::QXcbScreen(QXcbConnection *connection, xcb_screen_t *scr,
+     if (dpr_scaling_enabled)
+         m_noFontHinting = true;
+ 
+-#ifdef Q_XCB_DEBUG
+-    qDebug();
+-    qDebug("Screen output %s of xcb screen %d:", m_outputName.toUtf8().constData(), m_number);
+-    qDebug("  width..........: %lf", m_sizeMillimeters.width());
+-    qDebug("  height.........: %lf", m_sizeMillimeters.height());
+-    qDebug("  geometry.......: %d x %d +%d +%d", m_geometry.width(), m_geometry.height(), m_geometry.x(), m_geometry.y());
+-    qDebug("  virtual width..: %lf", m_virtualSizeMillimeters.width());
+-    qDebug("  virtual height.: %lf", m_virtualSizeMillimeters.height());
+-    qDebug("  virtual geom...: %d x %d", m_virtualSize.width(), m_virtualSize.height());
+-    qDebug("  avail virt geom: %d x %d +%d +%d", m_availableGeometry.width(), m_availableGeometry.height(), m_availableGeometry.x(), m_availableGeometry.y());
+-    qDebug("  orientation....: %d", m_orientation);
+-    qDebug("  pixel ratio....: %d", m_devicePixelRatio);
+-    qDebug("  depth..........: %d", screen()->root_depth);
+-    qDebug("  white pixel....: %x", screen()->white_pixel);
+-    qDebug("  black pixel....: %x", screen()->black_pixel);
+-    qDebug("  refresh rate...: %d", m_refreshRate);
+-    qDebug("  root ID........: %x", screen()->root);
+-#endif
+-
+     QScopedPointer<xcb_get_window_attributes_reply_t, QScopedPointerPodDeleter> rootAttribs(
+         xcb_get_window_attributes_reply(xcb_connection(),
+             xcb_get_window_attributes_unchecked(xcb_connection(), screen()->root), NULL));
+@@ -146,10 +127,6 @@ QXcbScreen::QXcbScreen(QXcbConnection *connection, xcb_screen_t *scr,
+                                      atom(QXcbAtom::UTF8_STRING), 0, 1024), NULL);
+             if (windowManagerReply && windowManagerReply->format == 8 && windowManagerReply->type == atom(QXcbAtom::UTF8_STRING)) {
+                 m_windowManagerName = QString::fromUtf8((const char *)xcb_get_property_value(windowManagerReply), xcb_get_property_value_length(windowManagerReply));
+-#ifdef Q_XCB_DEBUG
+-                qDebug("  window manager.: %s", qPrintable(m_windowManagerName));
+-                qDebug();
+-#endif
+             }
+ 
+             free(windowManagerReply);
+@@ -702,4 +679,48 @@ QXcbXSettings *QXcbScreen::xSettings() const
+     }
+     return m_xSettings;
+ }
++
++static inline void formatRect(QDebug &debug, const QRect r)
++{
++    debug << r.width() << 'x' << r.height()
++        << forcesign << r.x() << r.y() << noforcesign;
++}
++
++static inline void formatSizeF(QDebug &debug, const QSizeF s)
++{
++    debug << s.width() << 'x' << s.height() << "mm";
++}
++
++QDebug operator<<(QDebug debug, const QXcbScreen *screen)
++{
++    const QDebugStateSaver saver(debug);
++    debug.nospace();
++    debug << "QXcbScreen(" << (void *)screen;
++    if (screen) {
++        debug << fixed << qSetRealNumberPrecision(1);
++        debug << ", name=" << screen->name();
++        debug << ", geometry=";
++        formatRect(debug, screen->geometry());
++        debug << ", availableGeometry=";
++        formatRect(debug, screen->availableGeometry());
++        debug << ", devicePixelRatio=" << screen->devicePixelRatio();
++        debug << ", logicalDpi=" << screen->logicalDpi();
++        debug << ", physicalSize=";
++        formatSizeF(debug, screen->physicalSize());
++        // TODO 5.6 if (debug.verbosity() > 2) {
++        debug << ", screenNumber=" << screen->screenNumber();
++        debug << ", virtualSize=" << screen->virtualSize().width() << "x" << screen->virtualSize().height() << " (";
++        formatSizeF(debug, screen->virtualSize());
++        debug << "), nativeGeometry=";
++        formatRect(debug, screen->nativeGeometry());
++        debug << ", orientation=" << screen->orientation();
++        debug << ", depth=" << screen->depth();
++        debug << ", refreshRate=" << screen->refreshRate();
++        debug << ", root=" << hex << screen->root();
++        debug << ", windowManagerName=" << screen->windowManagerName();
++    }
++    debug << ')';
++    return debug;
++}
++
+ QT_END_NAMESPACE
+diff --git a/src/plugins/platforms/xcb/qxcbscreen.h b/src/plugins/platforms/xcb/qxcbscreen.h
+index e9ab2ed..81c3445 100644
+--- a/src/plugins/platforms/xcb/qxcbscreen.h
++++ b/src/plugins/platforms/xcb/qxcbscreen.h
+@@ -49,6 +49,9 @@ QT_BEGIN_NAMESPACE
+ class QXcbConnection;
+ class QXcbCursor;
+ class QXcbXSettings;
++#ifndef QT_NO_DEBUG_STREAM
++class QDebug;
++#endif
+ 
+ class QXcbScreen : public QXcbObject, public QPlatformScreen
+ {
+@@ -67,6 +70,8 @@ public:
+     int depth() const { return m_screen->root_depth; }
+     QImage::Format format() const;
+     QSizeF physicalSize() const { return m_sizeMillimeters; }
++    QSize virtualSize() const { return m_virtualSize; }
++    QSizeF physicalVirtualSize() const { return m_virtualSizeMillimeters; }
+     QDpi logicalDpi() const;
+     qreal devicePixelRatio() const;
+     QPlatformCursor *cursor() const;
+@@ -139,6 +144,10 @@ private:
+     QXcbXSettings *m_xSettings;
+ };
+ 
++#ifndef QT_NO_DEBUG_STREAM
++QDebug operator<<(QDebug, const QXcbScreen *);
++#endif
++
+ QT_END_NAMESPACE
+ 
+ #endif
