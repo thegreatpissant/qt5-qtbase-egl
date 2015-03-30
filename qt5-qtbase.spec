@@ -37,7 +37,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -104,6 +104,7 @@ Patch207: qt5-qtbase-5.5-0007-xcb-create-a-screen-if-dimensions-are-known-but-ou
 Patch208: qt5-qtbase-5.5-Get_display_number_when_screen_number_is_omitted.patch
 
 
+Patch212: 0012-Fix-a-crash-in-QPlainTextEdit-documentChanged.patch
 Patch272: 0072-CMake-Fix-QObject-connect-failing-on-ARM.patch
 Patch294: 0094-Fix-Meta-.-shortcuts-on-XCB.patch
 Patch332: 0132-Call-ofono-nm-Registered-delayed-in-constructor-othe.patch
@@ -364,6 +365,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch207 -p1 -b .xcb0007
 %patch208 -p1 -b .ibus_get_display_number
 
+%patch212 -p1 -b .0012
 %patch272 -p1 -b .0072
 %patch294 -p1 -b .0094
 %patch332 -p1 -b .0132
@@ -879,6 +881,9 @@ fi
 
 
 %changelog
+* Mon Mar 30 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-6
+- Crash due to unsafe access to QTextLayout::lineCount (#1207279,QTBUG-43562)
+
 * Mon Mar 30 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-5
 - unable to use input methods in ibus-1.5.10 (#1203575)
 
