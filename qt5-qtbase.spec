@@ -37,7 +37,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -87,7 +87,9 @@ Patch50: qt5-poll.patch
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
-# Qt 5.5 patches rebased on Qt 5.4.1 for better XCB screen integration
+# Qt 5.5 patches
+
+# better XCB screen integration support rebased on Qt 5.4.1
 # fixes screen-handling related crashes and massive performance improvement
 # QTBUG-31389, QTBUG-38326, QTBUG-32973, QTBUG-40174, QTBUG-42985, QTBUG-42985, QTBUG-44388
 # https://bugzilla.redhat.com/show_bug.cgi?id=1083664
@@ -99,6 +101,7 @@ Patch204: qt5-qtbase-5.5-0004-xcb-do-not-create-dummy-qscreen-when-there-are-no-
 Patch205: qt5-qtbase-5.5-0005-improve-handling-of-xrandr-events-in-xcb-backend.patch
 Patch206: qt5-qtbase-5.5-0006-fix-segfault-when-requesting-root-window-and-there-are-no-screens.patch
 Patch207: qt5-qtbase-5.5-0007-xcb-create-a-screen-if-dimensions-are-known-but-outputs-are-not.patch
+Patch208: qt5-qtbase-5.5-Get_display_number_when_screen_number_is_omitted.patch
 
 
 Patch272: 0072-CMake-Fix-QObject-connect-failing-on-ARM.patch
@@ -359,6 +362,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch205 -p1 -b .xcb0005
 %patch206 -p1 -b .xcb0006
 %patch207 -p1 -b .xcb0007
+%patch208 -p1 -b .ibus_get_display_number
 
 %patch272 -p1 -b .0072
 %patch294 -p1 -b .0094
@@ -875,6 +879,9 @@ fi
 
 
 %changelog
+* Mon Mar 30 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-5
+- unable to use input methods in ibus-1.5.10 (#1203575)
+
 * Wed Mar 25 2015 Daniel Vrátil <dvratil@redhat.com> - 5.4.1-4
 - pull in set of upstream Qt 5.5 fixes and improvements for XCB screen handling rebased to 5.4
 
