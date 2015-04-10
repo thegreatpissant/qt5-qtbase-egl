@@ -15,10 +15,6 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-%if 0%{?fedora} > 22
-%global bootstrap 1
-%endif
-
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
@@ -37,7 +33,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -142,7 +138,11 @@ BuildRequires: libjpeg-devel
 BuildRequires: libmng-devel
 BuildRequires: libtiff-devel
 BuildRequires: pkgconfig(alsa)
+# http://bugzilla.redhat.com/1196359
+%if 0%{?fedora} || 0%{?rhel} > 6
+%global dbus -dbus-linked
 BuildRequires: pkgconfig(dbus-1)
+%endif
 BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
@@ -408,7 +408,7 @@ test -x configure || chmod +x configure
   -release \
   -shared \
   -accessibility \
-  -dbus-linked \
+  %{?dbus}%{!?dbus:-dbus} \
   -fontconfig \
   -glib \
   -gtkstyle \
@@ -437,7 +437,8 @@ test -x configure || chmod +x configure
   %{?tds} \
   %{?xkbcommon} \
   -system-zlib \
-  %{?use_gold_linker}
+  %{?use_gold_linker} \
+  -no-directfb
 
 make %{?_smp_mflags}
 
@@ -865,6 +866,11 @@ fi
 
 
 %changelog
+* Fri Apr 10 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.4.1-8
+- -dbus=runtime on el6 (#1196359)
+- drop f23 bootstrap
+- %%build: -no-directfb
+
 * Wed Apr 01 2015 Daniel Vrátil <dvratil@redhat.com> - 5.4.1-7
 - drop 5.5 XCB patches, the rebase is incomplete and does not work properly with Qt 5.4
 
