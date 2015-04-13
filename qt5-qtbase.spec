@@ -37,7 +37,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -103,6 +103,9 @@ Patch336: 0136-Make-sure-there-s-a-scene-before-using-it.patch
 # http://lists.qt-project.org/pipermail/announce/2015-February/000059.html
 # CVE-2015-0295
 Patch349: 0149-Fix-a-division-by-zero-when-processing-malformed-BMP.patch
+# CVE-2015-1858, CVE-2015-1859, CVE-2015-1860
+Patch400: 0200-Fixes-crash-in-gif-image-decoder.patch
+Patch401: 0201-Fixes-crash-in-bmp-and-ico-image-decoding.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -359,6 +362,8 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch332 -p1 -b .0132
 %patch336 -p1 -b .0136
 %patch349 -p1 -b .0149
+%patch400 -p1 -b .0200
+%patch401 -p1 -b .0201
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -870,6 +875,9 @@ fi
 
 
 %changelog
+* Mon Apr 13 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-9
+- Multiple Vulnerabilities in Qt Image Format Handling (CVE-2015-1860 CVE-2015-1859 CVE-2015-1858)
+
 * Fri Apr 10 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.4.1-8
 - -dbus=runtime on el6 (#1196359)
 - %%build: -no-directfb
