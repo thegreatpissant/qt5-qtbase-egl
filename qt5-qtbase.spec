@@ -37,7 +37,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -795,6 +795,8 @@ fi
 
 %if 0%{?examples}
 %files examples
+%dir %{_qt5_docdir}/qdoc/
+%{_qt5_docdir}/qdoc/examples-manifest.xml
 %{_qt5_examplesdir}/
 %endif
 
@@ -875,6 +877,9 @@ fi
 
 
 %changelog
+* Fri Apr 17 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-10
+- -examples: include %%{_qt5_docdir}/qdoc/examples-manifest.xml (#1212750)
+
 * Mon Apr 13 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-9
 - Multiple Vulnerabilities in Qt Image Format Handling (CVE-2015-1860 CVE-2015-1859 CVE-2015-1858)
 
