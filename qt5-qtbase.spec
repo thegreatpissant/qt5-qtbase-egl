@@ -795,8 +795,10 @@ fi
 
 %if 0%{?examples}
 %files examples
+%if 0%{?docs}
 %dir %{_qt5_docdir}/qdoc/
 %{_qt5_docdir}/qdoc/examples-manifest.xml
+%endif
 %{_qt5_examplesdir}/
 %endif
 
