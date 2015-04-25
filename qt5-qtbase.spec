@@ -37,7 +37,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 10%{?dist}
+Release: 11%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -75,6 +75,10 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
 # unconditionally enable freetype lcdfilter support
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
+
+# hack out largely useless (to users) warnings about qdbusconnection
+# (often in kde apps), keep an eye on https://git.reviewboard.kde.org/r/103699/
+Patch25: qtbase-opensource-src-5.5.1-qdbusconnection_no_debug.patch
 
 # upstreamable patches
 # support poll
@@ -346,6 +350,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
+%patch25 -p1 -b .qdbusconnection_no_debug
 
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .QTBUG-42985
@@ -879,6 +884,9 @@ fi
 
 
 %changelog
+* Sat Apr 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-11
+- port qtdbusconnection_no_debug.patch from qt(4)
+
 * Fri Apr 17 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-10
 - -examples: include %%{_qt5_docdir}/qdoc/examples-manifest.xml (#1212750)
 
