@@ -37,7 +37,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 11%{?dist}
+Release: 12%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -98,12 +98,13 @@ Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 # Qt 5.5 patches
 Patch208: qt5-qtbase-5.5-Get_display_number_when_screen_number_is_omitted.patch
 
-
+Patch204: 0004-Fix-QPrinter-setPaperSize-regression-when-using-QPri.patch
 Patch212: 0012-Fix-a-crash-in-QPlainTextEdit-documentChanged.patch
 Patch272: 0072-CMake-Fix-QObject-connect-failing-on-ARM.patch
 Patch294: 0094-Fix-Meta-.-shortcuts-on-XCB.patch
 Patch332: 0132-Call-ofono-nm-Registered-delayed-in-constructor-othe.patch
 Patch336: 0136-Make-sure-there-s-a-scene-before-using-it.patch
+Patch440: 0240-QLockFile-fix-deadlock-when-the-lock-file-is-corrupt.patch
 # http://lists.qt-project.org/pipermail/announce/2015-February/000059.html
 # CVE-2015-0295
 Patch349: 0149-Fix-a-division-by-zero-when-processing-malformed-BMP.patch
@@ -223,6 +224,7 @@ Conflicts: qt < 1:4.8.6-10
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
 %endif
+Requires: %{name}-common = %{version}-%{release}
 
 ## Sql drivers
 %if 0%{?rhel}
@@ -242,6 +244,13 @@ Qt is a software toolkit for developing applications.
 
 This package contains base tools, like string, xml, and network
 handling.
+
+%package common
+Summary: Common files for Qt5
+Requires: %{name} = %{version}-%{release}
+BuildArch: noarch
+%description common
+%{summary}.
 
 %package devel
 Summary: Development files for %{name}
@@ -361,6 +370,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 %patch208 -p1 -b .ibus_get_display_number
 
+%patch204 -p1 -b .0004
 %patch212 -p1 -b .0012
 %patch272 -p1 -b .0072
 %patch294 -p1 -b .0094
@@ -369,6 +379,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch349 -p1 -b .0149
 %patch400 -p1 -b .0200
 %patch401 -p1 -b .0201
+%patch440 -p1 -b .0240
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -613,7 +624,6 @@ if [ $1 -eq 0 ]; then
 fi
 %endif
 
-
 %files
 %doc LICENSE.LGPL* LGPL_EXCEPTION.txt
 %if 0%{?qtchooser}
@@ -672,6 +682,9 @@ fi
 %dir %{_qt5_plugindir}/styles/
 %{_qt5_plugindir}/sqldrivers/libqsqlite.so
 %{_qt5_libdir}/cmake/Qt5Sql/Qt5Sql_QSQLiteDriverPlugin.cmake
+
+%files common
+# empty for now, consider: filesystem/dir ownership, licenses
 
 %if 0%{?docs}
 %files doc
@@ -884,6 +897,10 @@ fi
 
 
 %changelog
+* Fri May 01 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.4.1-12
+- backport a couple more upstream fixes
+- introduce -common noarch subpkg, should help multilib issues
+
 * Sat Apr 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-11
 - port qtdbusconnection_no_debug.patch from qt(4)
 
