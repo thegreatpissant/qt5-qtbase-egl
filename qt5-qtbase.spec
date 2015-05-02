@@ -15,7 +15,9 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-#global bootstrap 1
+%if 0%{?fedora} > 22
+%global bootstrap 1
+%endif
 
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
@@ -898,7 +900,6 @@ fi
 * Fri May 01 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.4.1-12
 - backport a couple more upstream fixes
 - introduce -common noarch subpkg, should help multilib issues
-- drop bootstrap (#1211203)
 
 * Sat Apr 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-11
 - port qtdbusconnection_no_debug.patch from qt(4)
