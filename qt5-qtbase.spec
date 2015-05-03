@@ -15,9 +15,9 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-%if 0%{?fedora} > 22
-%global bootstrap 1
-%endif
+#if 0%{?fedora} > 22
+#global bootstrap 1
+#endif
 
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
@@ -37,7 +37,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 12%{?dist}
+Release: 13%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -897,6 +897,9 @@ fi
 
 
 %changelog
+* Sun May 03 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-13
+- drop bootstrap
+
 * Fri May 01 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.4.1-12
 - backport a couple more upstream fixes
 - introduce -common noarch subpkg, should help multilib issues
