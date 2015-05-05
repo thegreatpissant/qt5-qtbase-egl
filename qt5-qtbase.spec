@@ -37,7 +37,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 12%{?dist}
+Release: 13%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -105,6 +105,7 @@ Patch294: 0094-Fix-Meta-.-shortcuts-on-XCB.patch
 Patch332: 0132-Call-ofono-nm-Registered-delayed-in-constructor-othe.patch
 Patch336: 0136-Make-sure-there-s-a-scene-before-using-it.patch
 Patch440: 0240-QLockFile-fix-deadlock-when-the-lock-file-is-corrupt.patch
+Patch448: 0248-QNAM-Fix-upload-corruptions-when-server-closes-conne.patch
 # http://lists.qt-project.org/pipermail/announce/2015-February/000059.html
 # CVE-2015-0295
 Patch349: 0149-Fix-a-division-by-zero-when-processing-malformed-BMP.patch
@@ -380,6 +381,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch400 -p1 -b .0200
 %patch401 -p1 -b .0201
 %patch440 -p1 -b .0240
+%patch448 -p1 -b .0248
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -897,6 +899,9 @@ fi
 
 
 %changelog
+* Tue May 05 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-13
+- backport: data corruption in QNetworkAccessManager
+
 * Fri May 01 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.4.1-12
 - backport a couple more upstream fixes
 - introduce -common noarch subpkg, should help multilib issues
