@@ -37,7 +37,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 14%{?dist}
+Release: 15%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -478,6 +478,9 @@ make %{?_smp_mflags}
 %if 0%{?docs}
 # wierd but necessary, to force regeration to use just-built qdoc
 rm -fv src/corelib/Makefile
+# HACK to avoid multilib conflicts in noarch content
+# see also https://bugreports.qt-project.org/browse/QTBUG-42071
+QT_HASH_SEED=0; export QT_HASH_SEED
 make %{?_smp_mflags} docs
 %endif
 
@@ -700,6 +703,8 @@ fi
 %doc dist/README dist/changes-5.*
 %{_qt5_docdir}/*.qch
 %{_qt5_docdir}/qdoc/
+# included in -examples instead, see bug #1212750
+%exclude %{_qt5_docdir}/qdoc/examples-manifest.xml
 %{_qt5_docdir}/qmake/
 %{_qt5_docdir}/qtconcurrent/
 %{_qt5_docdir}/qtcore/
@@ -905,6 +910,9 @@ fi
 
 
 %changelog
+* Thu May 07 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-15
+- try harder to avoid doc/multilib conflicts (#1212750)
+
 * Wed May 06 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-14
 - Shortcuts with KeypadModifier not working (QTBUG-33093,#1219173)
 
