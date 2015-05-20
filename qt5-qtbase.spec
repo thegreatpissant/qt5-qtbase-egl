@@ -19,6 +19,11 @@
 %global bootstrap 1
 %endif
 
+%if 0%{?fedora} > 21
+# use external qt_settings pkg
+%global qt_settings 1
+%endif
+
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
@@ -37,7 +42,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 17%{?dist}
+Release: 18%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -234,6 +239,9 @@ Conflicts: qt < 1:4.8.6-10
 %endif
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
+%endif
+%if 0%{?qt_settings}
+Requires: qt-settings
 %endif
 Requires: %{name}-common = %{version}-%{release}
 
@@ -918,6 +926,9 @@ fi
 
 
 %changelog
+* Wed May 20 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-18
+- Requires: qt-settings (f22+)
+
 * Sat May 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-17
 - Try to ensure that -fPIC is used in CMake builds (QTBUG-45755)
 
