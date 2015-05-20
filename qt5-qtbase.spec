@@ -545,6 +545,7 @@ sed -i \
 
 # create/own dirs
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
+mkdir -p %{buildroot}%{_sysconfdir}/xdg/QtProject
 
 # hardlink files to %{_bindir}, add -qt5 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
@@ -660,6 +661,7 @@ fi
 %ghost %{_sysconfdir}/xdg/qtchooser/5.conf
 %{_sysconfdir}/xdg/qtchooser/5-%{__isa_bits}.conf
 %endif
+%dir %{_sysconfdir}/xdg/QtProject/
 %{_qt5_libdir}/libQt5Concurrent.so.5*
 %{_qt5_libdir}/libQt5Core.so.5*
 %{_qt5_libdir}/libQt5DBus.so.5*
@@ -927,6 +929,7 @@ fi
 
 %changelog
 * Wed May 20 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-18
+- own /etc/xdg/QtProject
 - Requires: qt-settings (f22+)
 
 * Sat May 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-17
