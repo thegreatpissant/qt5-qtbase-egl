@@ -42,7 +42,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 18%{?dist}
+Release: 19%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -99,6 +99,11 @@ Patch51: qtbase-opensource-src-5.4.0-QTBUG-42985.patch
 # https://bugreports.qt.io/browse/QTBUG-33093
 # https://codereview.qt-project.org/#/c/95219/
 Patch52:  qtbase-opensource-src-5.4.1-QTBUG-33093.patch
+
+# https://bugreports.qt.io/browse/QTBUG-45484
+# QWidget::setWindowRole does nothing
+# adapted to apply on top of patch51
+Patch53: qtbase-opensource-src-5.4.1-QTBUG-45484.patch
 
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
@@ -383,6 +388,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .QTBUG-42985
 %patch52 -p1 -b .QTBUG-33093
+%patch53 -p1 -b .QTBUG-45484
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
@@ -928,6 +934,9 @@ fi
 
 
 %changelog
+* Mon May 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-19
+- QWidget::setWindowRole does nothing (QTBUG-45484)
+
 * Wed May 20 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-18
 - own /etc/xdg/QtProject
 - Requires: qt-settings (f22+)
