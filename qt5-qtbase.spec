@@ -939,7 +939,10 @@ fi
 
 
 %changelog
-* Mon May 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-20
+* Tue May 26 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-20
+- SM_CLIENT_ID property is not set (QTBUG-46310)
+
+* Mon May 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-19
 - QWidget::setWindowRole does nothing (QTBUG-45484)
 
 * Wed May 20 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-18
