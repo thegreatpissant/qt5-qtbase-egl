@@ -42,7 +42,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.1
-Release: 19%{?dist}
+Release: 20%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -939,7 +939,7 @@ fi
 
 
 %changelog
-* Mon May 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-19
+* Mon May 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-20
 - QWidget::setWindowRole does nothing (QTBUG-45484)
 
 * Wed May 20 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-18
