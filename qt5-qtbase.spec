@@ -105,6 +105,10 @@ Patch52:  qtbase-opensource-src-5.4.1-QTBUG-33093.patch
 # adapted to apply on top of patch51
 Patch53: qtbase-opensource-src-5.4.1-QTBUG-45484.patch
 
+# https://bugreports.qt.io/browse/QTBUG-46310
+#SM_CLIENT_ID property is not set
+Patch54: https://bugreports.qt.io/secure/attachment/48820/0002-xcb-set-SM_CLIENT_ID-property.patch
+
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
 # 'make docs' crash on el6, use qSort instead of std::sort
@@ -389,6 +393,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch51 -p1 -b .QTBUG-42985
 %patch52 -p1 -b .QTBUG-33093
 %patch53 -p1 -b .QTBUG-45484
+%patch54 -p1 -b .QTBUG-46310
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
