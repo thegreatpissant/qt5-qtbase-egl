@@ -41,8 +41,8 @@
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.4.1
-Release: 20%{?dist}
+Version: 5.4.2
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -116,19 +116,6 @@ Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
 # Qt 5.5 patches
 Patch208: qt5-qtbase-5.5-Get_display_number_when_screen_number_is_omitted.patch
-
-Patch204: 0004-Fix-QPrinter-setPaperSize-regression-when-using-QPri.patch
-Patch212: 0012-Fix-a-crash-in-QPlainTextEdit-documentChanged.patch
-Patch272: 0072-CMake-Fix-QObject-connect-failing-on-ARM.patch
-Patch294: 0094-Fix-Meta-.-shortcuts-on-XCB.patch
-Patch332: 0132-Call-ofono-nm-Registered-delayed-in-constructor-othe.patch
-Patch336: 0136-Make-sure-there-s-a-scene-before-using-it.patch
-Patch440: 0240-QLockFile-fix-deadlock-when-the-lock-file-is-corrupt.patch
-Patch448: 0248-QNAM-Fix-upload-corruptions-when-server-closes-conne.patch
-Patch460: 0260-Require-fPIC-instead-of-just-fPIE-for-reduce-relocat.patch
-# from 5.4.2 branch
-Patch461: 0260-Make-qglobal.h-complain-if-you-use-fPIE.patch
-Patch462: 0262-Try-to-ensure-that-fPIC-is-used-in-CMake-builds.patch
 
 # http://lists.qt-project.org/pipermail/announce/2015-February/000059.html
 # CVE-2015-0295
@@ -400,21 +387,6 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %endif
 
 %patch208 -p1 -b .ibus_get_display_number
-
-%patch204 -p1 -b .0004
-%patch212 -p1 -b .0012
-%patch272 -p1 -b .0072
-%patch294 -p1 -b .0094
-%patch332 -p1 -b .0132
-%patch336 -p1 -b .0136
-%patch349 -p1 -b .0149
-%patch400 -p1 -b .0200
-%patch401 -p1 -b .0201
-%patch440 -p1 -b .0240
-%patch448 -p1 -b .0248
-%patch460 -p1 -b .0260
-%patch461 -p1 -b .0260-2
-%patch462 -p1 -b .0262
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -939,6 +911,9 @@ fi
 
 
 %changelog
+* Tue Jun 02 2015 Jan Grulich <jgrulich@redhat.com> 5.4.2-1
+- Update to 5.4.2
+
 * Tue May 26 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-20
 - SM_CLIENT_ID property is not set (QTBUG-46310)
 
