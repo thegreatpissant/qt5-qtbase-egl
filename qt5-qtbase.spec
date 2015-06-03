@@ -34,8 +34,8 @@
 #define snap 2014-10-07_40
 #define snap_tag 20141007_40
 
-Summary: Qt5 - QtBase components
-Name:    qt5-qtbase
+Summary: Qt5 - QtBase components EGL support
+Name:    qt5-qtbase-egl
 Version: 5.4.1
 Release: 15%{?dist}
 
@@ -471,7 +471,10 @@ test -x configure || chmod +x configure
   %{?xkbcommon} \
   -system-zlib \
   %{?use_gold_linker} \
-  -no-directfb
+  -no-directfb \
+  -egl \
+  -opengl \
+  -no-xcb-xlib
 
 make %{?_smp_mflags}
 
