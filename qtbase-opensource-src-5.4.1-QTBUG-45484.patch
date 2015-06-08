@@ -1,127 +1,165 @@
-diff -up qtbase-opensource-src-5.4.1/src/gui/kernel/qplatformwindow.cpp.QTBUG-45484 qtbase-opensource-src-5.4.1/src/gui/kernel/qplatformwindow.cpp
---- qtbase-opensource-src-5.4.1/src/gui/kernel/qplatformwindow.cpp.QTBUG-45484	2015-02-16 22:56:48.000000000 -0600
-+++ qtbase-opensource-src-5.4.1/src/gui/kernel/qplatformwindow.cpp	2015-05-25 08:45:55.305771441 -0500
-@@ -286,6 +286,16 @@ void QPlatformWindow::setWindowFilePath(
- void QPlatformWindow::setWindowIcon(const QIcon &icon) { Q_UNUSED(icon); }
- 
- /*!
-+  Reimplement to set the window role to \a role
-+*/
-+void QPlatformWindow::setWindowRole(const QString &role) { Q_UNUSED(role); }
-+
-+/*!
-+  Reimplement to get the window role
-+*/
-+QString QPlatformWindow::windowRole() const { return QString(); }
-+
-+/*!
-   Reimplement to be able to let Qt raise windows to the top of the desktop
- */
- void QPlatformWindow::raise() { qWarning("This plugin does not support raise()"); }
-diff -up qtbase-opensource-src-5.4.1/src/gui/kernel/qplatformwindow.h.QTBUG-45484 qtbase-opensource-src-5.4.1/src/gui/kernel/qplatformwindow.h
---- qtbase-opensource-src-5.4.1/src/gui/kernel/qplatformwindow.h.QTBUG-45484	2015-02-16 22:56:48.000000000 -0600
-+++ qtbase-opensource-src-5.4.1/src/gui/kernel/qplatformwindow.h	2015-05-25 08:45:55.305771441 -0500
-@@ -90,9 +90,12 @@ public:
-     virtual void setWindowTitle(const QString &title);
-     virtual void setWindowFilePath(const QString &title);
-     virtual void setWindowIcon(const QIcon &icon);
-+    virtual void setWindowRole(const QString &role);
-     virtual void raise();
-     virtual void lower();
- 
-+    virtual QString windowRole() const;
-+
-     virtual bool isExposed() const;
-     virtual bool isActive() const;
-     virtual bool isEmbedded(const QPlatformWindow *parentWindow) const;
-diff -up qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.cpp.QTBUG-45484 qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.cpp
---- qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.cpp.QTBUG-45484	2015-05-25 08:45:55.258771302 -0500
-+++ qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.cpp	2015-05-25 09:07:12.608572492 -0500
-@@ -256,6 +256,7 @@ QXcbWindow::QXcbWindow(QWindow *window)
-     , m_lastWindowStateEvent(-1)
-     , m_syncState(NoSyncNeeded)
-     , m_pendingSyncRequest(0)
-+    , m_windowRole()
- {
-     setConnection(xcbscreen()->connection());
- 
-@@ -1455,6 +1456,20 @@ void QXcbWindow::setWindowIcon(const QIc
+From 7187a71d80d5bd14171dae1215df454c64f8c8b8 Mon Sep 17 00:00:00 2001
+From: Alexander Volkov <a.volkov@rusbitech.ru>
+Date: Mon, 8 Jun 2015 14:35:22 +0300
+Subject: [PATCH 1/2] Fix QWidget::setWindowRole()
+
+Introduce QXcbWindowFunctions::setWmWindowRole() and call it either from
+the implementation of QWidget::setWindowRole() or after the creation of
+the corresponding QWidgetWindow.
+
+Change-Id: I143450f4673dd707bb491c1d0f0e8b61d564283d
+Task-number: QTBUG-45484
+---
+ .../xcbfunctions/qxcbwindowfunctions.h              | 10 ++++++++++
+ src/plugins/platforms/xcb/qxcbnativeinterface.cpp   |  3 +++
+ src/plugins/platforms/xcb/qxcbwindow.cpp            | 21 +++++++++++++++++++++
+ src/plugins/platforms/xcb/qxcbwindow.h              |  2 ++
+ src/widgets/kernel/qwidget.cpp                      | 12 +++++++-----
+ 5 files changed, 43 insertions(+), 5 deletions(-)
+
+diff --git a/src/platformheaders/xcbfunctions/qxcbwindowfunctions.h b/src/platformheaders/xcbfunctions/qxcbwindowfunctions.h
+index 5227732..d166c9f 100644
+--- a/src/platformheaders/xcbfunctions/qxcbwindowfunctions.h
++++ b/src/platformheaders/xcbfunctions/qxcbwindowfunctions.h
+@@ -72,6 +72,16 @@ public:
+         if (func)
+             func(window, type);
      }
- }
- 
-+void QXcbWindow::setWindowRole(const QString &role)
-+{
-+    const QByteArray ba = role.toLatin1();
-+    Q_XCB_CALL(xcb_change_property(xcb_connection(),
-+                                   XCB_PROP_MODE_REPLACE,
-+                                   m_window,
-+                                   atom(QXcbAtom::WM_WINDOW_ROLE),
-+                                   XCB_ATOM_STRING,
-+                                   8,
-+                                   ba.length(),
-+                                   ba.constData()));
-+    m_windowRole = role;
-+}
 +
- void QXcbWindow::raise()
- {
-     const quint32 mask = XCB_CONFIG_WINDOW_STACK_MODE;
-diff -up qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.h.QTBUG-45484 qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.h
---- qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.h.QTBUG-45484	2015-05-25 08:45:55.258771302 -0500
-+++ qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.h	2015-05-25 08:45:55.306771444 -0500
-@@ -88,8 +88,12 @@ public:
- 
-     void setWindowTitle(const QString &title);
-     void setWindowIcon(const QIcon &icon);
-+    void setWindowRole(const QString &role);
-     void raise();
-     void lower();
++    typedef void (*SetWmWindowRole)(QWindow *window, const QByteArray &role);
++    static const QByteArray setWmWindowRoleIdentifier() { return QByteArrayLiteral("XcbSetWmWindowRole"); }
 +
-+    QString windowRole() const Q_DECL_OVERRIDE { return m_windowRole; }
-+
-     void propagateSizeHints();
- 
-     void requestActivateWindow();
-@@ -234,6 +238,8 @@ private:
-     SyncState m_syncState;
- 
-     QXcbSyncWindowRequest *m_pendingSyncRequest;
-+
-+    QString m_windowRole;
++    static void setWmWindowRole(QWindow *window, const QByteArray &role)
++    {
++        SetWmWindowRole func = reinterpret_cast<SetWmWindowRole>(QGuiApplication::platformFunction(setWmWindowRoleIdentifier()));
++        if (func)
++            func(window, role);
++    }
  };
  
- QT_END_NAMESPACE
-diff -up qtbase-opensource-src-5.4.1/src/widgets/kernel/qwidget.cpp.QTBUG-45484 qtbase-opensource-src-5.4.1/src/widgets/kernel/qwidget.cpp
---- qtbase-opensource-src-5.4.1/src/widgets/kernel/qwidget.cpp.QTBUG-45484	2015-02-16 22:56:40.000000000 -0600
-+++ qtbase-opensource-src-5.4.1/src/widgets/kernel/qwidget.cpp	2015-05-25 08:45:55.309771453 -0500
-@@ -6226,8 +6226,11 @@ void QWidgetPrivate::setWindowFilePath_s
  
- QString QWidget::windowRole() const
- {
--    Q_D(const QWidget);
--    return (d->extra && d->extra->topextra) ? d->extra->topextra->role : QString();
-+    if (const QWindow *window = windowHandle())
-+        if (QPlatformWindow *platformWindow = window->handle())
-+            return platformWindow->windowRole();
-+
-+    return QString();
+diff --git a/src/plugins/platforms/xcb/qxcbnativeinterface.cpp b/src/plugins/platforms/xcb/qxcbnativeinterface.cpp
+index 31dedd4..0bd49b8 100644
+--- a/src/plugins/platforms/xcb/qxcbnativeinterface.cpp
++++ b/src/plugins/platforms/xcb/qxcbnativeinterface.cpp
+@@ -339,6 +339,9 @@ QFunctionPointer QXcbNativeInterface::platformFunction(const QByteArray &functio
+     if (function == QXcbWindowFunctions::setWmWindowTypeIdentifier()) {
+         return QFunctionPointer(QXcbWindow::setWmWindowTypeStatic);
+     }
++    if (function == QXcbWindowFunctions::setWmWindowRoleIdentifier()) {
++        return QFunctionPointer(QXcbWindow::setWmWindowRoleStatic);
++    }
+     return Q_NULLPTR;
  }
  
- /*!
-@@ -6236,13 +6239,9 @@ QString QWidget::windowRole() const
+diff --git a/src/plugins/platforms/xcb/qxcbwindow.cpp b/src/plugins/platforms/xcb/qxcbwindow.cpp
+index 0094278..14e186a 100644
+--- a/src/plugins/platforms/xcb/qxcbwindow.cpp
++++ b/src/plugins/platforms/xcb/qxcbwindow.cpp
+@@ -236,6 +236,7 @@ static inline bool positionIncludesFrame(QWindow *w)
+ }
+ 
+ static const char *wm_window_type_property_id = "_q_xcb_wm_window_type";
++static const char *wm_window_role_property_id = "_q_xcb_wm_window_role";
+ 
+ QXcbWindow::QXcbWindow(QWindow *window)
+     : QPlatformWindow(window)
+@@ -562,6 +563,11 @@ void QXcbWindow::create()
+         setOpacity(opacity);
+     if (window()->isTopLevel())
+         setWindowIcon(window()->icon());
++
++    if (window()->dynamicPropertyNames().contains(wm_window_type_property_id)) {
++        QByteArray wmWindowRole = window()->property(wm_window_type_property_id).toByteArray();
++        setWmWindowRole(wmWindowRole);
++    }
+ }
+ 
+ QXcbWindow::~QXcbWindow()
+@@ -1596,6 +1602,14 @@ void QXcbWindow::setWmWindowTypeStatic(QWindow *window, QXcbWindowFunctions::WmW
+         window->setProperty(wm_window_type_property_id, QVariant::fromValue(static_cast<int>(windowTypes)));
+ }
+ 
++void QXcbWindow::setWmWindowRoleStatic(QWindow *window, const QByteArray &role)
++{
++    if (window->handle())
++        static_cast<QXcbWindow *>(window->handle())->setWmWindowRole(role);
++    else
++        window->setProperty(wm_window_role_property_id, role);
++}
++
+ QXcbWindowFunctions::WmWindowTypes QXcbWindow::wmWindowTypes() const
+ {
+     QXcbWindowFunctions::WmWindowTypes result(0);
+@@ -1712,6 +1726,13 @@ void QXcbWindow::setWmWindowType(QXcbWindowFunctions::WmWindowTypes types)
+     xcb_flush(xcb_connection());
+ }
+ 
++void QXcbWindow::setWmWindowRole(const QByteArray &role)
++{
++    Q_XCB_CALL(xcb_change_property(xcb_connection(), XCB_PROP_MODE_REPLACE, m_window,
++                                   atom(QXcbAtom::WM_WINDOW_ROLE), XCB_ATOM_STRING, 8,
++                                   role.size(), role.constData()));
++}
++
+ class ExposeCompressor
+ {
+ public:
+diff --git a/src/plugins/platforms/xcb/qxcbwindow.h b/src/plugins/platforms/xcb/qxcbwindow.h
+index 254421e..2c9964c 100644
+--- a/src/plugins/platforms/xcb/qxcbwindow.h
++++ b/src/plugins/platforms/xcb/qxcbwindow.h
+@@ -143,9 +143,11 @@ public:
+ #endif
+ 
+     static void setWmWindowTypeStatic(QWindow *window, QXcbWindowFunctions::WmWindowTypes windowTypes);
++    static void setWmWindowRoleStatic(QWindow *window, const QByteArray &role);
+ 
+     QXcbWindowFunctions::WmWindowTypes wmWindowTypes() const;
+     void setWmWindowType(QXcbWindowFunctions::WmWindowTypes types);
++    void setWmWindowRole(const QByteArray &role);
+ 
+     bool needsSync() const;
+ 
+diff --git a/src/widgets/kernel/qwidget.cpp b/src/widgets/kernel/qwidget.cpp
+index c99e15b..bc4750e 100644
+--- a/src/widgets/kernel/qwidget.cpp
++++ b/src/widgets/kernel/qwidget.cpp
+@@ -100,6 +100,7 @@
+ 
+ #include "qwindowcontainer_p.h"
+ 
++#include "QtPlatformHeaders/qxcbwindowfunctions.h"
+ 
+ // widget/widget data creation count
+ //#define QWIDGET_EXTRA_DEBUG
+@@ -1445,6 +1446,9 @@ void QWidgetPrivate::create_sys(WId window, bool initializeWindow, bool destroyO
+ 
+     data.window_flags = win->flags();
+ 
++    if (!topData()->role.isNull())
++        QXcbWindowFunctions::setWmWindowRole(win, topData()->role.toLatin1());
++
+     QBackingStore *store = q->backingStore();
+ 
+     if (!store) {
+@@ -6236,13 +6240,11 @@ QString QWidget::windowRole() const
  */
  void QWidget::setWindowRole(const QString &role)
  {
 -#if defined(Q_WS_X11)
--    Q_D(QWidget);
--    d->topData()->role = role;
+     Q_D(QWidget);
++    d->createTLExtra();
+     d->topData()->role = role;
 -    d->setWindowRole();
 -#else
 -    Q_UNUSED(role)
 -#endif
-+    if (const QWindow *window = windowHandle())
-+        if (QPlatformWindow *platformWindow = window->handle())
-+            return platformWindow->setWindowRole(role);
++    if (windowHandle())
++        QXcbWindowFunctions::setWmWindowRole(windowHandle(), role.toLatin1());
  }
  
  /*!
+-- 
+2.4.2
+

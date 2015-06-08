@@ -42,7 +42,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -107,7 +107,7 @@ Patch53: qtbase-opensource-src-5.4.1-QTBUG-45484.patch
 
 # https://bugreports.qt.io/browse/QTBUG-46310
 #SM_CLIENT_ID property is not set
-Patch54: https://bugreports.qt.io/secure/attachment/48820/0002-xcb-set-SM_CLIENT_ID-property.patch
+Patch54: qtbase-opensource-src-5.4.1-QTBUG-46310.patch
 
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
@@ -911,6 +911,9 @@ fi
 
 
 %changelog
+* Mon Jun 08 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.2-2
+- rebase to latest SM patches (QTBUG-45484, QTBUG-46310)
+
 * Tue Jun 02 2015 Jan Grulich <jgrulich@redhat.com> 5.4.2-1
 - Update to 5.4.2
 
