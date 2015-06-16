@@ -42,7 +42,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.4.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -911,6 +911,9 @@ fi
 
 
 %changelog
+* Tue Jun 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.2-3
+- macros.qt5: fix qmake_qt5 so "FOO=BAR %%qmake_qt5" works as expected
+
 * Mon Jun 08 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.2-2
 - rebase to latest SM patches (QTBUG-45484, QTBUG-46310)
 
