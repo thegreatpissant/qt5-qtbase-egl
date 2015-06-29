@@ -18,7 +18,8 @@
 %_qt5_sysconfdir %{_qt5_settingsdir}
 %_qt5_translationdir %{_datadir}/qt5/translations
 
-%qmake_qt5 %{_qt5_qmake} \\\
+%qmake_qt5 \
+  %{_qt5_qmake} \\\
   QMAKE_CFLAGS_DEBUG="${CFLAGS:-%optflags}" \\\
   QMAKE_CFLAGS_RELEASE="${CFLAGS:-%optflags}" \\\
   QMAKE_CXXFLAGS_DEBUG="${CXXFLAGS:-%optflags}" \\\

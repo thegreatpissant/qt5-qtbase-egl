@@ -15,9 +15,7 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-%if 0%{?fedora} > 22
-%global bootstrap 1
-%endif
+%global bootstrap 0
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -35,27 +33,17 @@
 
 %define examples 1
 
-#define pre rc
-#define snap 2014-10-07_40
-#define snap_tag 20141007_40
+%define prerelease rc
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
-Version: 5.4.2
-Release: 3%{?dist}
+Version: 5.5.0
+Release: 0.3.rc%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-%if 0%{?snap:1}
-Source0: http://download.qt-project.org/snapshots/qt/5.4/%{version}-%{pre}/%{snap}/submodules/%{qt_module}-opensource-src-%{version}-%{pre}.tar.xz
-%else
-%if 0%{?pre:1}
-Source0: http://download.qt-project.org/development_releases/qt/5.4/%{version}-%{pre}/submodules/%{qt_module}-opensource-src-%{version}-%{pre}.tar.xz
-%else
-Source0: http://download.qt-project.org/official_releases/qt/5.4/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
-%endif
-%endif
+Source0: http://download.qt.io/development_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
@@ -67,10 +55,13 @@ Source6: 10-qt5-check-opengl2.sh
 
 # support the old version of libxcb and the resulting lack of libxkbcommon-x11
 # in F19 and F20
+%if 0%{?old_xcb}
 Patch0: qtbase-opensource-src-5.4.0-rc-old_xcb.patch
-
+%if 0%{?old_xkbcommon}
 # support the old version of libxkbcommon in F19
 Patch1: qtbase-opensource-src-5.4.0-rc-old_xkbcommon.patch
+%endif
+%endif
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
@@ -81,48 +72,11 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 # unconditionally enable freetype lcdfilter support
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 
-# hack out largely useless (to users) warnings about qdbusconnection
-# (often in kde apps), keep an eye on https://git.reviewboard.kde.org/r/103699/
-Patch25: qtbase-opensource-src-5.5.1-qdbusconnection_no_debug.patch
-
 # upstreamable patches
 # support poll
 # https://bugreports.qt-project.org/browse/QTBUG-27195
 # NEEDS REBASE
 Patch50: qt5-poll.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1083664
-# https://bugreports.qt.io/browse/QTBUG-42985
-Patch51: qtbase-opensource-src-5.4.0-QTBUG-42985.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1219173
-# https://bugreports.qt.io/browse/QTBUG-33093
-# https://codereview.qt-project.org/#/c/95219/
-Patch52:  qtbase-opensource-src-5.4.1-QTBUG-33093.patch
-
-# https://bugreports.qt.io/browse/QTBUG-45484
-# QWidget::setWindowRole does nothing
-# adapted to apply on top of patch51
-Patch53: qtbase-opensource-src-5.4.1-QTBUG-45484.patch
-
-# https://bugreports.qt.io/browse/QTBUG-46310
-#SM_CLIENT_ID property is not set
-Patch54: qtbase-opensource-src-5.4.1-QTBUG-46310.patch
-
-## upstream patches
-# workaround https://bugreports.qt-project.org/browse/QTBUG-43057
-# 'make docs' crash on el6, use qSort instead of std::sort
-Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
-
-# Qt 5.5 patches
-Patch208: qt5-qtbase-5.5-Get_display_number_when_screen_number_is_omitted.patch
-
-# http://lists.qt-project.org/pipermail/announce/2015-February/000059.html
-# CVE-2015-0295
-Patch349: 0149-Fix-a-division-by-zero-when-processing-malformed-BMP.patch
-# CVE-2015-1858, CVE-2015-1859, CVE-2015-1860
-Patch400: 0200-Fixes-crash-in-gif-image-decoder.patch
-Patch401: 0201-Fixes-crash-in-bmp-and-ico-image-decoding.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -167,6 +121,7 @@ BuildRequires: pkgconfig(alsa)
 %global dbus -dbus-linked
 BuildRequires: pkgconfig(dbus-1)
 %endif
+BuildRequires: pkgconfig(libinput)
 BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
@@ -360,7 +315,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 
 %prep
-%setup -q -n qtbase-opensource-src-%{version}%{?pre:-%{pre}}
+%setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 
 %if 0%{?old_xcb}
 %patch0 -p1 -b .old_xcb
@@ -374,19 +329,8 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
-%patch25 -p1 -b .qdbusconnection_no_debug
 
 #patch50 -p1 -b .poll
-%patch51 -p1 -b .QTBUG-42985
-%patch52 -p1 -b .QTBUG-33093
-%patch53 -p1 -b .QTBUG-45484
-%patch54 -p1 -b .QTBUG-46310
-
-%if 0%{?rhel} == 6
-%patch100 -p1 -b .QTBUG-43057
-%endif
-
-%patch208 -p1 -b .ibus_get_display_number
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -411,14 +355,13 @@ mv sqlite UNUSED/
 %endif
 popd
 
-
 # builds failing mysteriously on f20
 # ./configure: Permission denied
 # check to ensure that can't happen -- rex
 test -x configure || chmod +x configure
 
-%build
 
+%build
 # limit -reduce-relocations to %%ix86 x86_64 archs, https://bugreports.qt-project.org/browse/QTBUG-36129
 ./configure -v \
   -confirm-license \
@@ -577,19 +520,17 @@ popd
 
 install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 
-
 ## work-in-progress, doesn't work yet -- rex
 %check
 export CMAKE_PREFIX_PATH=%{buildroot}%{_prefix}
 export CTEST_OUTPUT_ON_FAILURE=1
 export PATH=%{buildroot}%{_bindir}:$PATH
 export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
-mkdir tests/auto/cmake/%{_target_platform}
+mkdir -p tests/auto/cmake/%{_target_platform}
 pushd tests/auto/cmake/%{_target_platform}
 cmake .. ||:
 ctest --output-on-failure ||:
 popd
-
 
 %if 0%{?qtchooser}
 %pre
@@ -636,7 +577,7 @@ fi
 %endif
 
 %files
-%doc LICENSE.LGPL* LGPL_EXCEPTION.txt
+%doc LICENSE.LGPL* LGPL_EXCEPTION.txt LICENSE.FDL
 %if 0%{?qtchooser}
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
@@ -680,7 +621,6 @@ fi
 %{_qt5_libdir}/cmake/Qt5Network/Qt5Network_QConnmanEnginePlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Network/Qt5Network_QGenericEnginePlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Network/Qt5Network_QNetworkManagerEnginePlugin.cmake
-#dir %{_qt5_plugindir}/accessible/
 %dir %{_qt5_plugindir}/designer/
 %dir %{_qt5_plugindir}/generic/
 %dir %{_qt5_plugindir}/iconengines/
@@ -780,6 +720,8 @@ fi
 %{_qt5_libdir}/libQt5Test.so
 %{_qt5_libdir}/libQt5Widgets.prl
 %{_qt5_libdir}/libQt5Widgets.so
+%{_qt5_libdir}/libQt5XcbQpa.prl
+%{_qt5_libdir}/libQt5XcbQpa.so
 %{_qt5_libdir}/libQt5Xml.prl
 %{_qt5_libdir}/libQt5Xml.so
 %{_qt5_libdir}/cmake/Qt5/Qt5Config*.cmake
@@ -809,7 +751,14 @@ fi
 %{_qt5_libdir}/pkgconfig/Qt5Sql.pc
 %{_qt5_libdir}/pkgconfig/Qt5Test.pc
 %{_qt5_libdir}/pkgconfig/Qt5Widgets.pc
+%{_qt5_libdir}/pkgconfig/Qt5XcbQpa.pc
 %{_qt5_libdir}/pkgconfig/Qt5Xml.pc
+%if 0%{?egl}
+%{_qt5_libdir}/libQt5EglDeviceIntegration.prl
+%{_qt5_libdir}/libQt5EglDeviceIntegration.so
+%{_qt5_libdir}/pkgconfig/Qt5EglDeviceIntegration.pc
+%endif
+
 
 %files static
 %{_qt5_libdir}/libQt5Bootstrap.*a
@@ -869,15 +818,19 @@ fi
 %{_qt5_libdir}/libQt5OpenGL.so.5*
 %{_qt5_libdir}/libQt5PrintSupport.so.5*
 %{_qt5_libdir}/libQt5Widgets.so.5*
-#{_qt5_plugindir}/accessible/libqtaccessiblewidgets.so
+%{_qt5_libdir}/libQt5XcbQpa.so.5*
 %{_qt5_plugindir}/generic/libqevdevkeyboardplugin.so
 %{_qt5_plugindir}/generic/libqevdevmouseplugin.so
 %{_qt5_plugindir}/generic/libqevdevtabletplugin.so
 %{_qt5_plugindir}/generic/libqevdevtouchplugin.so
+%{_qt5_plugindir}/generic/libqlibinputplugin.so
+%{_qt5_plugindir}/generic/libqtuiotouchplugin.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevKeyboardPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevTabletPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevTouchScreenPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake
 %{_qt5_plugindir}/imageformats/libqgif.so
 %{_qt5_plugindir}/imageformats/libqico.so
 %{_qt5_plugindir}/imageformats/libqjpeg.so
@@ -889,12 +842,17 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QComposePlatformInputContextPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake
 %if 0%{?egl}
+%{_qt5_libdir}/libQt5EglDeviceIntegration.so.5*
 %{_qt5_plugindir}/platforms/libqeglfs.so
-%{_qt5_plugindir}/platforms/libqkms.so
 %{_qt5_plugindir}/platforms/libqminimalegl.so
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QKmsIntegrationPlugin.cmake
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-integration.so
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
+%{_qt5_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
 %endif
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
@@ -904,6 +862,8 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake
+%{_qt5_plugindir}/xcbglintegrations/libqxcb-glx-integration.so
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbGlxIntegrationPlugin.cmake
 %{_qt5_plugindir}/platformthemes/libqgtk2.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGtk2ThemePlugin.cmake
 %{_qt5_plugindir}/printsupport/libcupsprintersupport.so
@@ -911,8 +871,14 @@ fi
 
 
 %changelog
-* Tue Jun 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.2-3
-- macros.qt5: fix qmake_qt5 so "FOO=BAR %%qmake_qt5" works as expected
+* Thu Jun 25 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.3.rc
+- Disable bootstrap
+
+* Wed Jun 24 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.2.rc
+- Update for official RC1 released packages
+
+* Mon Jun 15 2015 Daniel Vratil <dvratil@redhat.com> 5.5.0-0.1.rc
+- Qt 5.5 RC 1
 
 * Mon Jun 08 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.2-2
 - rebase to latest SM patches (QTBUG-45484, QTBUG-46310)
