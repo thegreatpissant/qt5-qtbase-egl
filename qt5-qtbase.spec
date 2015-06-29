@@ -15,7 +15,7 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-%global bootstrap 1
+%global bootstrap 0
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -38,7 +38,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 0.4.rc%{?dist}
+Release: 0.5.rc%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -871,6 +871,9 @@ fi
 
 
 %changelog
+* Mon Jun 29 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.5.rc
+- Second round of builds now with bootstrap enabled due new qttools
+
 * Mon Jun 29 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.4.rc
 - Enable bootstrap to first import on rawhide
 
