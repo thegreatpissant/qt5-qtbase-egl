@@ -33,17 +33,17 @@
 
 %define examples 1
 
-%define prerelease rc
+#define prerelease rc
 
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 0.5.rc%{?dist}
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://download.qt.io/development_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
+Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
