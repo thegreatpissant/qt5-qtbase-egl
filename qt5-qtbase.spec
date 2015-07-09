@@ -38,7 +38,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -71,6 +71,9 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
 # unconditionally enable freetype lcdfilter support
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
+
+# fix issue on big endian platform
+Patch13: qtbase-opensource-src-5.5.x-big-endian.patch
 
 # upstreamable patches
 # support poll
@@ -329,6 +332,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
+%patch13 -p1 -b .big-endian
 
 #patch50 -p1 -b .poll
 
@@ -871,6 +875,9 @@ fi
 
 
 %changelog
+* Thu Jul 09 2015 Than Ngo <than@redhat.com> - 5.5.0-2
+- fix build failure on big endian platform (ppc64,s390x)
+
 * Mon Jun 29 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.5.rc
 - Second round of builds now with bootstrap enabled due new qttools
 
