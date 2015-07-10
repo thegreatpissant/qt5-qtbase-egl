@@ -1,42 +1,12 @@
 diff -up qtbase-opensource-src-5.5.0/src/gui/image/qimage_conversions.cpp.than qtbase-opensource-src-5.5.0/src/gui/image/qimage_conversions.cpp
 --- qtbase-opensource-src-5.5.0/src/gui/image/qimage_conversions.cpp.than	2015-07-09 17:01:29.605707305 +0200
-+++ qtbase-opensource-src-5.5.0/src/gui/image/qimage_conversions.cpp	2015-07-09 17:57:43.590576263 +0200
-@@ -1085,11 +1085,15 @@ static void mask_alpha_converter_RGBx(QI
++++ qtbase-opensource-src-5.5.0/src/gui/image/qimage_conversions.cpp	2015-07-10 12:39:04.022599044 +0200
+@@ -1103,7 +1103,7 @@ static bool mask_alpha_converter_rgbx_in
+         }
+         rgb_data += pad;
+     }
+-    data->format = DestFormat;
++    data->format = QImage::Format_RGBX8888;
+     return true;
  #endif
  }
- 
-+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
- static bool mask_alpha_converter_rgbx_inplace(QImageData *data, Qt::ImageConversionFlags flags)
- {
--#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
-     return mask_alpha_converter_inplace<QImage::Format_RGBX8888>(data, flags);
-+}
- #else
-+template<QImage::Format DestFormat>
-+static bool mask_alpha_converter_rgbx_inplace(QImageData *data, Qt::ImageConversionFlags flags)
-+{
-     Q_UNUSED(flags);
- 
-     const int pad = (data->bytes_per_line >> 2) - data->width;
-@@ -1105,8 +1109,8 @@ static bool mask_alpha_converter_rgbx_in
-     }
-     data->format = DestFormat;
-     return true;
--#endif
- }
-+#endif
- 
- static QVector<QRgb> fix_color_table(const QVector<QRgb> &ctbl, QImage::Format format)
- {
-@@ -2704,7 +2708,11 @@ InPlace_Image_Converter qimage_inplace_c
-         0,
-         0,
-         0,
-+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
-         mask_alpha_converter_rgbx_inplace,
-+#else
-+        mask_alpha_converter_rgbx_inplace<QImage::Format_RGB32>,
-+#endif
- #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN && __SSE2__
-         0,
-         convert_ARGB_to_ARGB_PM_inplace_sse2,

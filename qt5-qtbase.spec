@@ -38,7 +38,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -875,6 +875,9 @@ fi
 
 
 %changelog
+* Fri Jul 10 2015 Than Ngo <than@redhat.com> - 5.5.0-3
+- add better fix for compile error on big endian
+
 * Thu Jul 09 2015 Than Ngo <than@redhat.com> - 5.5.0-2
 - fix build failure on big endian platform (ppc64,s390x)
 
