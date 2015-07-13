@@ -38,7 +38,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -80,6 +80,10 @@ Patch13: qtbase-opensource-src-5.5.x-big-endian.patch
 # https://bugreports.qt-project.org/browse/QTBUG-27195
 # NEEDS REBASE
 Patch50: qt5-poll.patch
+
+# Qt5 application crashes when connecting/disconnecting displays
+# https://bugzilla.redhat.com/show_bug.cgi?id=1083664
+Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -335,6 +339,7 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch13 -p1 -b .big-endian
 
 #patch50 -p1 -b .poll
+%patch51 -p1 -b .disconnect_displays
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -875,6 +880,9 @@ fi
 
 
 %changelog
+* Mon Jul 13 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-4
+- Qt5 application crashes when connecting/disconnecting displays (#1083664)
+
 * Fri Jul 10 2015 Than Ngo <than@redhat.com> - 5.5.0-3
 - add better fix for compile error on big endian
 
