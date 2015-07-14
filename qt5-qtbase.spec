@@ -16,7 +16,7 @@
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 ## set to 1 to enable bootstrap
-%global bootstrap 1
+#global bootstrap 1
 
 %if 0%{?fedora} > 21
 # use external qt_settings pkg
@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -881,6 +881,9 @@ fi
 
 
 %changelog
+* Tue Jul 14 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-6
+- disable bootstrap again
+
 * Tue Jul 14 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-5
 - enable bootstrap (and disable failing docs)
 
