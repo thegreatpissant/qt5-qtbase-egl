@@ -125,7 +125,6 @@ BuildRequires: pkgconfig(alsa)
 %global dbus -dbus-linked
 BuildRequires: pkgconfig(dbus-1)
 %endif
-BuildRequires: pkgconfig(libinput)
 BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(gl)
@@ -141,6 +140,8 @@ BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
 %global xkbcommon -system-xkbcommon
 %if 0%{?fedora} > 20
+# libinput is currently f21+ only
+BuildRequires: pkgconfig(libinput)
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
