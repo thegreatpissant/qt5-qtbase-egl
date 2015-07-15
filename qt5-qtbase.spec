@@ -141,6 +141,7 @@ BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %global xkbcommon -system-xkbcommon
 %if 0%{?fedora} > 20
 # libinput is currently f21+ only
+%global libinput 1
 BuildRequires: pkgconfig(libinput)
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
@@ -830,7 +831,9 @@ fi
 %{_qt5_plugindir}/generic/libqevdevmouseplugin.so
 %{_qt5_plugindir}/generic/libqevdevtabletplugin.so
 %{_qt5_plugindir}/generic/libqevdevtouchplugin.so
+%if 0%{?libinput}
 %{_qt5_plugindir}/generic/libqlibinputplugin.so
+%endif
 %{_qt5_plugindir}/generic/libqtuiotouchplugin.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevKeyboardPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake
