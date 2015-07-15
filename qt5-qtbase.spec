@@ -56,13 +56,9 @@ Source6: 10-qt5-check-opengl2.sh
 
 # support the old version of libxcb and the resulting lack of libxkbcommon-x11
 # in F19 and F20
-%if 0%{?old_xcb}
 Patch0: qtbase-opensource-src-5.4.0-rc-old_xcb.patch
-%if 0%{?old_xkbcommon}
 # support the old version of libxkbcommon in F19
 Patch1: qtbase-opensource-src-5.4.0-rc-old_xkbcommon.patch
-%endif
-%endif
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
