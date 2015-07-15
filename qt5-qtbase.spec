@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -69,6 +69,10 @@ Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 # unconditionally enable freetype lcdfilter support
 Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 
+# hack out largely useless (to users) warnings about qdbusconnection
+# (often in kde apps), keep an eye on https://git.reviewboard.kde.org/r/103699/
+Patch25: qtbase-opensource-src-5.5.1-qdbusconnection_no_debug.patch
+
 # fix issue on big endian platform
 Patch13: qtbase-opensource-src-5.5.x-big-endian.patch
 
@@ -81,6 +85,25 @@ Patch50: qt5-poll.patch
 # Qt5 application crashes when connecting/disconnecting displays
 # https://bugzilla.redhat.com/show_bug.cgi?id=1083664
 Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1219173
+# https://bugreports.qt.io/browse/QTBUG-33093
+# https://codereview.qt-project.org/#/c/95219/
+Patch52:  qtbase-opensource-src-5.4.1-QTBUG-33093.patch
+
+# https://bugreports.qt.io/browse/QTBUG-45484
+# QWidget::setWindowRole does nothing
+# adapted to apply on top of patch51
+Patch53: qtbase-opensource-src-5.4.1-QTBUG-45484.patch
+
+# https://bugreports.qt.io/browse/QTBUG-46310
+#SM_CLIENT_ID property is not set
+Patch54: qtbase-opensource-src-5.4.1-QTBUG-46310.patch
+
+## upstream patches
+# workaround https://bugreports.qt-project.org/browse/QTBUG-43057
+# 'make docs' crash on el6, use qSort instead of std::sort
+Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -335,10 +358,18 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
+%patch25 -p1 -b .qdbusconnection_no_debug
 %patch13 -p1 -b .big-endian
 
 #patch50 -p1 -b .poll
 %patch51 -p1 -b .disconnect_displays
+%patch52 -p1 -b .QTBUG-33093
+%patch53 -p1 -b .QTBUG-45484
+%patch54 -p1 -b .QTBUG-46310
+
+%if 0%{?rhel} == 6
+%patch100 -p1 -b .QTBUG-43057
+%endif
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -881,6 +912,9 @@ fi
 
 
 %changelog
+* Wed Jul 15 2015 Jan Grulich <jgrulich@redhat.com> 5.5.0-7
+- restore previously dropped patches
+
 * Tue Jul 14 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-6
 - disable bootstrap again
 

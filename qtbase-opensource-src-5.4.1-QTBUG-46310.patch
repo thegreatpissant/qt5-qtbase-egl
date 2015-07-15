@@ -1,18 +1,19 @@
-diff -up qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbconnection.cpp.QTBUG-46310 qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbconnection.cpp
---- qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbconnection.cpp.QTBUG-46310	2015-06-08 18:55:19.427037122 +0300
-+++ qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbconnection.cpp	2015-06-08 18:55:19.436036915 +0300
-@@ -330,6 +330,7 @@ QXcbConnection::QXcbConnection(QXcbNativ
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.cpp b/src/plugins/platforms/xcb/qxcbconnection.cpp
+index 80c844e..d21ff4e 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.cpp
++++ b/src/plugins/platforms/xcb/qxcbconnection.cpp
+@@ -454,6 +454,7 @@ QXcbConnection::QXcbConnection(QXcbNativeInterface *nativeInterface, bool canGra
      , has_xkb(false)
      , m_buttons(0)
      , m_focusWindow(0)
 +    , m_clientLeader(0)
      , m_systemTrayTracker(0)
- {
- #ifdef XCB_USE_EGL
-@@ -1241,6 +1242,58 @@ xcb_window_t QXcbConnection::rootWindow(
-     return primaryScreen()->root();
- }
- 
+     , m_glIntegration(Q_NULLPTR)
+     , m_xiGrab(false)
+@@ -1353,6 +1354,58 @@ void *QXcbConnection::createVisualInfoForDefaultVisualId() const
+
+ #endif
+
 +xcb_window_t QXcbConnection::clientLeader()
 +{
 +    if (m_clientLeader == 0) {
@@ -68,33 +69,34 @@ diff -up qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbconnection.cp
  void QXcbConnection::processXcbEvents()
  {
      int connection_error = xcb_connection_has_error(xcb_connection());
-diff -up qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbconnection.h.QTBUG-46310 qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbconnection.h
---- qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbconnection.h.QTBUG-46310	2015-02-17 06:56:51.000000000 +0200
-+++ qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbconnection.h	2015-06-08 18:55:19.436036915 +0300
-@@ -394,6 +394,8 @@ public:
- 
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.h b/src/plugins/platforms/xcb/qxcbconnection.h
+index 2005ae0..dcfb3f0 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.h
++++ b/src/plugins/platforms/xcb/qxcbconnection.h
+@@ -402,6 +402,7 @@ public:
+
      QXcbWMSupport *wmSupport() const { return m_wmSupport.data(); }
      xcb_window_t rootWindow();
 +    xcb_window_t clientLeader();
-+
- #ifdef XCB_USE_XLIB
-     void *xlib_display() const { return m_xlib_display; }
- #endif
-@@ -617,6 +619,7 @@ private:
- 
+
+     bool hasDefaultVisualId() const { return m_defaultVisualId != UINT_MAX; }
+     xcb_visualid_t defaultVisualId() const { return m_defaultVisualId; }
+@@ -640,6 +641,7 @@ private:
+
      QXcbWindow *m_focusWindow;
- 
+
 +    xcb_window_t m_clientLeader;
      QByteArray m_startupId;
      QXcbSystemTrayTracker *m_systemTrayTracker;
- 
-diff -up qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbscreen.cpp.QTBUG-46310 qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbscreen.cpp
---- qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbscreen.cpp.QTBUG-46310	2015-02-17 06:56:51.000000000 +0200
-+++ qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbscreen.cpp	2015-06-08 18:55:19.436036915 +0300
-@@ -163,38 +163,6 @@ QXcbScreen::QXcbScreen(QXcbConnection *c
+     QXcbGlIntegration *m_glIntegration;
+diff --git a/src/plugins/platforms/xcb/qxcbscreen.cpp b/src/plugins/platforms/xcb/qxcbscreen.cpp
+index 63e4d9e..9783682 100644
+--- a/src/plugins/platforms/xcb/qxcbscreen.cpp
++++ b/src/plugins/platforms/xcb/qxcbscreen.cpp
+@@ -170,38 +170,6 @@ QXcbScreen::QXcbScreen(QXcbConnection *connection, QXcbVirtualDesktop *virtualDe
      else
          m_syncRequestSupported = true;
- 
+
 -    m_clientLeader = xcb_generate_id(xcb_connection());
 -    Q_XCB_CALL2(xcb_create_window(xcb_connection(),
 -                                  XCB_COPY_FROM_PARENT,
@@ -129,44 +131,46 @@ diff -up qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbscreen.cpp.QT
 -
      xcb_depth_iterator_t depth_iterator =
          xcb_screen_allowed_depths_iterator(screen());
- 
-diff -up qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbscreen.h.QTBUG-46310 qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbscreen.h
---- qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbscreen.h.QTBUG-46310	2015-02-17 06:56:51.000000000 +0200
-+++ qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbscreen.h	2015-06-08 18:55:19.437036892 +0300
-@@ -80,8 +80,6 @@ public:
-     xcb_screen_t *screen() const { return m_screen; }
-     xcb_window_t root() const { return m_screen->root; }
- 
+
+diff --git a/src/plugins/platforms/xcb/qxcbscreen.h b/src/plugins/platforms/xcb/qxcbscreen.h
+index ec05e3b..6534206 100644
+--- a/src/plugins/platforms/xcb/qxcbscreen.h
++++ b/src/plugins/platforms/xcb/qxcbscreen.h
+@@ -116,8 +116,6 @@ public:
+     xcb_randr_crtc_t crtc() const { return m_crtc; }
+     xcb_randr_mode_t mode() const { return m_mode; }
+
 -    xcb_window_t clientLeader() const { return m_clientLeader; }
 -
      void windowShown(QXcbWindow *window);
      QString windowManagerName() const { return m_windowManagerName; }
      bool syncRequestSupported() const { return m_syncRequestSupported; }
-@@ -125,7 +123,6 @@ private:
-     int m_number;
+@@ -171,7 +169,6 @@ private:
+     Qt::ScreenOrientation m_orientation;
      QString m_windowManagerName;
      bool m_syncRequestSupported;
 -    xcb_window_t m_clientLeader;
      QMap<xcb_visualid_t, xcb_visualtype_t> m_visuals;
      QMap<xcb_visualid_t, quint8> m_visualDepths;
      QXcbCursor *m_cursor;
-diff -up qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.cpp.QTBUG-46310 qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.cpp
---- qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.cpp.QTBUG-46310	2015-06-08 18:55:19.437036892 +0300
-+++ qtbase-opensource-src-5.4.1/src/plugins/platforms/xcb/qxcbwindow.cpp	2015-06-08 18:56:40.773169979 +0300
-@@ -525,7 +525,7 @@ void QXcbWindow::create()
- 
+diff --git a/src/plugins/platforms/xcb/qxcbwindow.cpp b/src/plugins/platforms/xcb/qxcbwindow.cpp
+index 7c043fb..adc8973 100644
+--- a/src/plugins/platforms/xcb/qxcbwindow.cpp
++++ b/src/plugins/platforms/xcb/qxcbwindow.cpp
+@@ -623,7 +623,7 @@ void QXcbWindow::create()
+
      xcb_set_wm_hints(xcb_connection(), m_window, &hints);
- 
--    xcb_window_t leader = screen->clientLeader();
+
+-    xcb_window_t leader = platformScreen->clientLeader();
 +    xcb_window_t leader = connection()->clientLeader();
      Q_XCB_CALL(xcb_change_property(xcb_connection(), XCB_PROP_MODE_REPLACE, m_window,
                                     atom(QXcbAtom::WM_CLIENT_LEADER), XCB_ATOM_WINDOW, 32,
                                     1, &leader));
-@@ -750,7 +750,7 @@ void QXcbWindow::show()
+@@ -864,7 +864,7 @@ void QXcbWindow::show()
              // Default to client leader if there is no transient parent, else modal dialogs can
              // be hidden by their parents.
              if (!transientXcbParent)
--                transientXcbParent = static_cast<QXcbScreen *>(xcbscreen())->clientLeader();
+-                transientXcbParent = xcbScreen()->clientLeader();
 +                transientXcbParent = connection()->clientLeader();
              if (transientXcbParent) { // ICCCM 4.1.2.6
                  Q_XCB_CALL(xcb_change_property(xcb_connection(), XCB_PROP_MODE_REPLACE, m_window,
