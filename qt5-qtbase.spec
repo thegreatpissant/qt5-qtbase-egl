@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -134,6 +134,8 @@ Source1: macros.qt5
 # RPM drag in gtk2 as a dependency for the GTK+ 2 dialog support.
 %global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
+# for doc hacks
+BuildRequires: gdb
 # for %%check
 BuildRequires: cmake
 BuildRequires: cups-devel
@@ -454,16 +456,27 @@ test -x configure || chmod +x configure
   %{?use_gold_linker} \
   -no-directfb
 
-make %{?_smp_mflags}
-
 %if 0%{?docs}
+# qdoc
+make sub-src-qmake_all %{?_smp_mflags}
+make sub-qdoc %{?_smp_mflags} -C src
 # wierd but necessary, to force regeration to use just-built qdoc
-rm -fv src/corelib/Makefile
+#rm -fv src/corelib/Makefile
 # HACK to avoid multilib conflicts in noarch content
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
-make %{?_smp_mflags} docs
+make docs %{?_smp_mflags} -k || \
+( pushd src/opengl
+  QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
+  gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/opengl -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/opengl/doc/qtopengl.qdocconf -prepare -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors 
+  QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
+  gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/qtopengl -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/opengl/doc/qtopengl.qdocconf -generate -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors
+  make qch_docs
+  popd
+)
 %endif
+
+make %{?_smp_mflags}
 
 
 %install
@@ -912,6 +925,9 @@ fi
 
 
 %changelog
+* Wed Jul 15 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-8
+- %%build: build docs first,  hack around 'make docs' failures (on f22+)
+
 * Wed Jul 15 2015 Jan Grulich <jgrulich@redhat.com> 5.5.0-7
 - restore previously dropped patches
 
