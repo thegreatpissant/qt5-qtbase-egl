@@ -32,7 +32,7 @@
 %endif
 %endif
 
-%define examples 1
+#define examples 1
 
 #define prerelease rc
 
@@ -460,10 +460,11 @@ make %{?_smp_mflags}
 
 %if 0%{?docs}
 # qdoc
-#make sub-src-qmake_all %{?_smp_mflags}
-#make sub-qdoc %{?_smp_mflags} -C src
-# wierd but necessary, to force regeration to use just-built qdoc
-#rm -fv src/corelib/Makefile
+# wierd but necessary, to force use of just-built qdoc
+rm -fv qmake/Makefile.qmake-docs src/corelib/Makefile
+pushd src; ../bin/qmake; make sub-qdoc; popd
+pushd src/corelib; ../../bin/qmake; popd
+pushd src/xml; ../../bin/qmake; popd
 # HACK to avoid multilib conflicts in noarch content
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
@@ -696,8 +697,10 @@ fi
 %doc dist/README dist/changes-5.*
 %{_qt5_docdir}/*.qch
 %{_qt5_docdir}/qdoc/
+%if 0%{?examples}
 # included in -examples instead, see bug #1212750
 %exclude %{_qt5_docdir}/qdoc/examples-manifest.xml
+%endif
 %{_qt5_docdir}/qmake/
 %{_qt5_docdir}/qtconcurrent/
 %{_qt5_docdir}/qtcore/
