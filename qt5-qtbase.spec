@@ -456,10 +456,12 @@ test -x configure || chmod +x configure
   %{?use_gold_linker} \
   -no-directfb
 
+make %{?_smp_mflags}
+
 %if 0%{?docs}
 # qdoc
-make sub-src-qmake_all %{?_smp_mflags}
-make sub-qdoc %{?_smp_mflags} -C src
+#make sub-src-qmake_all %{?_smp_mflags}
+#make sub-qdoc %{?_smp_mflags} -C src
 # wierd but necessary, to force regeration to use just-built qdoc
 #rm -fv src/corelib/Makefile
 # HACK to avoid multilib conflicts in noarch content
@@ -475,8 +477,6 @@ make docs %{?_smp_mflags} -k || \
   popd
 )
 %endif
-
-make %{?_smp_mflags}
 
 
 %install
@@ -926,7 +926,7 @@ fi
 
 %changelog
 * Wed Jul 15 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-8
-- %%build: build docs first,  hack around 'make docs' failures (on f22+)
+- %%build: hack around 'make docs' failures (on f22+)
 
 * Wed Jul 15 2015 Jan Grulich <jgrulich@redhat.com> 5.5.0-7
 - restore previously dropped patches
