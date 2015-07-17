@@ -39,12 +39,14 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
 Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
+
+Source2: qdoc.gdb
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
@@ -468,31 +470,12 @@ pushd src/xml; ../../bin/qmake; popd
 # HACK to avoid multilib conflicts in noarch content
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
-make html_docs MAKE='make -k' ||:
-if [ ! -f "doc/qtcore/qtcore.qhp" ]; then
-  pushd src/corelib/
-  QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
-  gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/qtcore -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/corelib/doc/qtcore.qdocconf -prepare -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors 
-  QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
-  gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/qtcore -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/corelib/doc/qtcore.qdocconf -generate -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors
-  popd
-fi
-if [ ! -f "doc/qtcore/qtopengl.qhp" ]; then
-  pushd src/opengl/
-  QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
-  gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/opengl -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/opengl/doc/qtopengl.qdocconf -prepare -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors 
-  QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
-  gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/opengl -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/opengl/doc/qtopengl.qdocconf -generate -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors
-  popd
-fi
-if [ ! -f "doc/qtnetwork/qtnetwork.qhp" ]; then
-  pushd src/network
-  QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
-  gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/qtnetwork -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/network/doc/qtnetwork.qdocconf -prepare -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors
-  QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
-  gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/qtnetwork -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/network/doc/qtnetwork.qdocconf -generate -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors
-  popd
-fi
+make html_docs MAKE='make -k' || \
+( mv bin/qdoc bin/qdoc.orig
+  install %{SOURCE2} bin/qdoc
+  make html_docs MAKE='make -k' ||:
+  mv bin/qdoc.orig bin/qdoc -f
+)
 make qch_docs
 %endif
 
@@ -945,6 +928,9 @@ fi
 
 
 %changelog
+* Fri Jul 17 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-9
+- use qdoc.gdb wrapper
+
 * Wed Jul 15 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-8
 - %%build: hack around 'make docs' failures (on f22+)
 
