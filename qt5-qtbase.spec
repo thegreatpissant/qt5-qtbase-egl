@@ -32,7 +32,7 @@
 %endif
 %endif
 
-#define examples 1
+%define examples 1
 
 #define prerelease rc
 
@@ -468,15 +468,24 @@ pushd src/xml; ../../bin/qmake; popd
 # HACK to avoid multilib conflicts in noarch content
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
-make html_docs %{?_smp_mflags} -k || \
-( pushd src/opengl
+make html_docs MAKE='make -k' ||:
+if [ ! -f "doc/qtcore/qtcore.qhp" ]; then
+  pushd src/corelib/
+  QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
+  gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/qtcore -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/corelib/doc/qtcore.qdocconf -prepare -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors 
+  QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
+  gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/qtcore -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/corelib/doc/qtcore.qdocconf -generate -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors
+  popd
+fi
+if [ ! -f "doc/qtcore/qtopengl.qhp" ]; then
+  pushd src/opengl
   QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
   gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/opengl -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/opengl/doc/qtopengl.qdocconf -prepare -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors 
   QT_INSTALL_DOCS=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc QT_VERSION_TAG=550 QT_VER=5.5 QT_VERSION=%{version} QT_PLUGIN_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/plugins LD_LIBRARY_PATH=${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
   gdb --eval-command="run" --eval-command="thread apply all bt" --eval-command="quit" --args ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/bin/qdoc -outputdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc/qtopengl -installdir /usr/share/doc/qt5 ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/src/opengl/doc/qtopengl.qdocconf -generate -indexdir ${RPM_BUILD_DIR}/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}/doc -no-link-errors
   popd
-)
-make qch_docs %{?_smp_mflags}
+fi
+make qch_docs
 %endif
 
 
