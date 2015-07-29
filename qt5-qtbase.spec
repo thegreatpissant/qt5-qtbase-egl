@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -271,8 +271,7 @@ Requires: pkgconfig(gl)
 Summary: API documentation for %{name}
 License: GFDL
 Requires: %{name} = %{version}-%{release}
-# for qhelpgenerator
-BuildRequires: qt5-qttools-devel
+BuildRequires: qt5-qhelpgenerator
 BuildArch: noarch
 %description doc
 %{summary}.
@@ -928,6 +927,9 @@ fi
 
 
 %changelog
+* Wed Jul 29 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-10
+- -docs: BuildRequires: qt5-qhelpgenerator
+
 * Fri Jul 17 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-9
 - use qdoc.gdb wrapper
 
