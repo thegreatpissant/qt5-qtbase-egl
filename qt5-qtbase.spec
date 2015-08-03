@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -335,6 +335,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %package gui
 Summary: Qt5 GUI-related libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
+Recommends: mesa-dri-drivers
 Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
 
@@ -927,6 +928,10 @@ fi
 
 
 %changelog
+* Mon Aug 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-11
+- Add mesa-dri-drivers as recommends on gui package as reported by Kevin Kofler
+- Reference https://bugzilla.redhat.com/1249280
+
 * Wed Jul 29 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-10
 - -docs: BuildRequires: qt5-qhelpgenerator
 
