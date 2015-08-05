@@ -919,7 +919,7 @@ fi
 
 
 %changelog
-* Wed Aug 08 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.5.0-12
+* Wed Aug 05 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.5.0-12
 - remove GDB hackery, it is not producing useful backtraces for the ARM crash
 
 * Mon Aug 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-11
