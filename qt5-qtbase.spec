@@ -928,7 +928,6 @@ fi
 
 
 %changelog
-<<<<<<< HEAD
 * Thu Aug 06 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-13
 - use upstream commit/fix for QTBUG-46310
 - restore qdoc/gdb hackery, i686 still needs it :(
