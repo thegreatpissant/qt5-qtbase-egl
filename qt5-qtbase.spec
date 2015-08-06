@@ -46,6 +46,8 @@ License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
 Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 
+Source2: qdoc.gdb
+
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
 Source5: qconfig-multilib.h
@@ -134,6 +136,8 @@ Source1: macros.qt5
 # RPM drag in gtk2 as a dependency for the GTK+ 2 dialog support.
 %global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
+# for doc hacks
+BuildRequires: gdb
 # for %%check
 BuildRequires: cmake
 BuildRequires: cups-devel
@@ -466,7 +470,12 @@ pushd src/xml; ../../bin/qmake; popd
 # HACK to avoid multilib conflicts in noarch content
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
-make html_docs
+make html_docs MAKE='make -k' || \
+( mv bin/qdoc bin/qdoc.orig
+  install %{SOURCE2} bin/qdoc
+  make html_docs MAKE='make -k' ||:
+  mv bin/qdoc.orig bin/qdoc -f
+)
 make qch_docs
 %endif
 
@@ -919,8 +928,10 @@ fi
 
 
 %changelog
+<<<<<<< HEAD
 * Thu Aug 06 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-13
 - use upstream commit/fix for QTBUG-46310
+- restore qdoc/gdb hackery, i686 still needs it :(
 
 * Wed Aug 05 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.5.0-12
 - remove GDB hackery, it is not producing useful backtraces for the ARM crash
