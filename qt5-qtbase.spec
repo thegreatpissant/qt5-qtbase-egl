@@ -39,7 +39,7 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -96,14 +96,14 @@ Patch52:  qtbase-opensource-src-5.4.1-QTBUG-33093.patch
 # adapted to apply on top of patch51
 Patch53: qtbase-opensource-src-5.4.1-QTBUG-45484.patch
 
-# https://bugreports.qt.io/browse/QTBUG-46310
-#SM_CLIENT_ID property is not set
-Patch54: qtbase-opensource-src-5.4.1-QTBUG-46310.patch
-
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
+
+# https://bugreports.qt.io/browse/QTBUG-46310
+#SM_CLIENT_ID property is not set
+Patch123: 0123-xcb-set-SM_CLIENT_ID-property.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -365,11 +365,11 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch51 -p1 -b .disconnect_displays
 %patch52 -p1 -b .QTBUG-33093
 %patch53 -p1 -b .QTBUG-45484
-%patch54 -p1 -b .QTBUG-46310
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
 %endif
+%patch123 -p1 -b .QTBUG-46310
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -919,6 +919,9 @@ fi
 
 
 %changelog
+* Thu Aug 06 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-13
+- use upstream commit/fix for QTBUG-46310
+
 * Wed Aug 05 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.5.0-12
 - remove GDB hackery, it is not producing useful backtraces for the ARM crash
 
