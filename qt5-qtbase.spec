@@ -39,14 +39,12 @@
 Summary: Qt5 - QtBase components
 Name:    qt5-qtbase
 Version: 5.5.0
-Release: 13%{?dist}
+Release: 14%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
 Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
-
-Source2: qdoc.gdb
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
@@ -136,8 +134,6 @@ Source1: macros.qt5
 # RPM drag in gtk2 as a dependency for the GTK+ 2 dialog support.
 %global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
-# for doc hacks
-BuildRequires: gdb
 # for %%check
 BuildRequires: cmake
 BuildRequires: cups-devel
@@ -470,12 +466,7 @@ pushd src/xml; ../../bin/qmake; popd
 # HACK to avoid multilib conflicts in noarch content
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
-make html_docs MAKE='make -k' || \
-( mv bin/qdoc bin/qdoc.orig
-  install %{SOURCE2} bin/qdoc
-  make html_docs MAKE='make -k' ||:
-  mv bin/qdoc.orig bin/qdoc -f
-)
+make html_docs
 make qch_docs
 %endif
 
@@ -928,6 +919,10 @@ fi
 
 
 %changelog
+* Fri Aug 07 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.5.0-14
+- remove GDB hackery again, -12 built fine on i686, hack breaks ARM build
+- fix 10-qt5-check-opengl2.sh for multiple screens (#1245755)
+
 * Thu Aug 06 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-13
 - use upstream commit/fix for QTBUG-46310
 - restore qdoc/gdb hackery, i686 still needs it :(
