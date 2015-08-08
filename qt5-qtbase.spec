@@ -342,7 +342,9 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %package gui
 Summary: Qt5 GUI-related libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
+%if 0%{?fedora} > 20
 Recommends: mesa-dri-drivers
+%endif
 Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
 
