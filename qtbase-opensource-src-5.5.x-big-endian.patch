@@ -1,0 +1,12 @@
+diff -up qtbase-opensource-src-5.5.0/src/gui/image/qimage_conversions.cpp.than qtbase-opensource-src-5.5.0/src/gui/image/qimage_conversions.cpp
+--- qtbase-opensource-src-5.5.0/src/gui/image/qimage_conversions.cpp.than	2015-07-09 17:01:29.605707305 +0200
++++ qtbase-opensource-src-5.5.0/src/gui/image/qimage_conversions.cpp	2015-07-10 12:39:04.022599044 +0200
+@@ -1103,7 +1103,7 @@ static bool mask_alpha_converter_rgbx_in
+         }
+         rgb_data += pad;
+     }
+-    data->format = DestFormat;
++    data->format = QImage::Format_RGBX8888;
+     return true;
+ #endif
+ }

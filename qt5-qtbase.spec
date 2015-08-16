@@ -2,6 +2,11 @@
 %define multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9 ppc64le
 %define multilib_basearchs x86_64 ppc64 s390x sparc64 ppc64le
 
+# use valgrind to debug qdoc HTML generation
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le s390x armv7hl aarch64
+%global valgrind 1
+%endif
+
 # support qtchooser (adds qtchooser .conf file)
 %define qtchooser 1
 %if 0%{?qtchooser}
@@ -15,8 +20,12 @@
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
-%if 0%{?fedora} > 22
-%global bootstrap 1
+## set to 1 to enable bootstrap
+#global bootstrap 1
+
+%if 0%{?fedora} > 21
+# use external qt_settings pkg
+%global qt_settings 1
 %endif
 
 # define to build docs, need to undef this for bootstrapping
@@ -30,27 +39,19 @@
 
 %define examples 1
 
-#define pre rc
-#define snap 2014-10-07_40
-#define snap_tag 20141007_40
+#define prerelease rc
 
 Summary: Qt5 - QtBase components EGL support
 Name:    qt5-qtbase-egl
-Version: 5.4.1
+Version: 5.5.0
 Release: 15%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-%if 0%{?snap:1}
-Source0: http://download.qt-project.org/snapshots/qt/5.4/%{version}-%{pre}/%{snap}/submodules/%{qt_module}-opensource-src-%{version}-%{pre}.tar.xz
-%else
-%if 0%{?pre:1}
-Source0: http://download.qt-project.org/development_releases/qt/5.4/%{version}-%{pre}/submodules/%{qt_module}-opensource-src-%{version}-%{pre}.tar.xz
-%else
-Source0: http://download.qt-project.org/official_releases/qt/5.4/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
-%endif
-%endif
+Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
+
+Source2: qdoc.valgrind
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
@@ -63,7 +64,6 @@ Source6: 10-qt5-check-opengl2.sh
 # support the old version of libxcb and the resulting lack of libxkbcommon-x11
 # in F19 and F20
 Patch0: qtbase-opensource-src-5.4.0-rc-old_xcb.patch
-
 # support the old version of libxkbcommon in F19
 Patch1: qtbase-opensource-src-5.4.0-rc-old_xkbcommon.patch
 
@@ -80,43 +80,37 @@ Patch12: qtbase-opensource-src-5.2.0-enable_ft_lcdfilter.patch
 # (often in kde apps), keep an eye on https://git.reviewboard.kde.org/r/103699/
 Patch25: qtbase-opensource-src-5.5.1-qdbusconnection_no_debug.patch
 
+# fix issue on big endian platform
+Patch13: qtbase-opensource-src-5.5.x-big-endian.patch
+
 # upstreamable patches
 # support poll
 # https://bugreports.qt-project.org/browse/QTBUG-27195
 # NEEDS REBASE
 Patch50: qt5-poll.patch
 
+# Qt5 application crashes when connecting/disconnecting displays
 # https://bugzilla.redhat.com/show_bug.cgi?id=1083664
-# https://bugreports.qt.io/browse/QTBUG-42985
-Patch51: qtbase-opensource-src-5.4.0-QTBUG-42985.patch
+Patch51: qtbase-opensource-src-5.5-disconnect_displays.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1219173
 # https://bugreports.qt.io/browse/QTBUG-33093
 # https://codereview.qt-project.org/#/c/95219/
 Patch52:  qtbase-opensource-src-5.4.1-QTBUG-33093.patch
 
+# https://bugreports.qt.io/browse/QTBUG-45484
+# QWidget::setWindowRole does nothing
+# adapted to apply on top of patch51
+Patch53: qtbase-opensource-src-5.4.1-QTBUG-45484.patch
+
 ## upstream patches
 # workaround https://bugreports.qt-project.org/browse/QTBUG-43057
 # 'make docs' crash on el6, use qSort instead of std::sort
 Patch100: qtbase-opensource-src-5.4.0-QTBUG-43057.patch
 
-# Qt 5.5 patches
-Patch208: qt5-qtbase-5.5-Get_display_number_when_screen_number_is_omitted.patch
-
-Patch204: 0004-Fix-QPrinter-setPaperSize-regression-when-using-QPri.patch
-Patch212: 0012-Fix-a-crash-in-QPlainTextEdit-documentChanged.patch
-Patch272: 0072-CMake-Fix-QObject-connect-failing-on-ARM.patch
-Patch294: 0094-Fix-Meta-.-shortcuts-on-XCB.patch
-Patch332: 0132-Call-ofono-nm-Registered-delayed-in-constructor-othe.patch
-Patch336: 0136-Make-sure-there-s-a-scene-before-using-it.patch
-Patch440: 0240-QLockFile-fix-deadlock-when-the-lock-file-is-corrupt.patch
-Patch448: 0248-QNAM-Fix-upload-corruptions-when-server-closes-conne.patch
-# http://lists.qt-project.org/pipermail/announce/2015-February/000059.html
-# CVE-2015-0295
-Patch349: 0149-Fix-a-division-by-zero-when-processing-malformed-BMP.patch
-# CVE-2015-1858, CVE-2015-1859, CVE-2015-1860
-Patch400: 0200-Fixes-crash-in-gif-image-decoder.patch
-Patch401: 0201-Fixes-crash-in-bmp-and-ico-image-decoding.patch
+# https://bugreports.qt.io/browse/QTBUG-46310
+#SM_CLIENT_ID property is not set
+Patch123: 0123-xcb-set-SM_CLIENT_ID-property.patch
 
 # macros, be mindful to keep sync'd with macros.qt5
 Source1: macros.qt5
@@ -147,6 +141,10 @@ Source1: macros.qt5
 # RPM drag in gtk2 as a dependency for the GTK+ 2 dialog support.
 %global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
 
+# for doc hacks
+%if 0%{?valgrind}
+BuildRequires: valgrind
+%endif
 # for %%check
 BuildRequires: cmake
 BuildRequires: cups-devel
@@ -176,6 +174,9 @@ BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?fedora}
 %global xkbcommon -system-xkbcommon
 %if 0%{?fedora} > 20
+# libinput is currently f21+ only
+%global libinput 1
+BuildRequires: pkgconfig(libinput)
 BuildRequires: pkgconfig(xcb-xkb) >= 1.10
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: pkgconfig(xkbcommon-x11) >= 0.4.1
@@ -230,6 +231,9 @@ Conflicts: qt < 1:4.8.6-10
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
 %endif
+%if 0%{?qt_settings}
+Requires: qt-settings
+%endif
 Requires: %{name}-common = %{version}-%{release}
 
 ## Sql drivers
@@ -274,8 +278,7 @@ Requires: pkgconfig(gl)
 Summary: API documentation for %{name}
 License: GFDL
 Requires: %{name} = %{version}-%{release}
-# for qhelpgenerator
-BuildRequires: qt5-qttools-devel
+BuildRequires: qt5-qhelpgenerator
 BuildArch: noarch
 %description doc
 %{summary}.
@@ -339,6 +342,9 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %package gui
 Summary: Qt5 GUI-related libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
+%if 0%{?fedora} > 20
+Recommends: mesa-dri-drivers
+%endif
 Obsoletes: qt5-qtbase-x11 < 5.2.0
 Provides:  qt5-qtbase-x11 = %{version}-%{release}
 
@@ -351,7 +357,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 
 %prep
-%setup -q -n qtbase-opensource-src-%{version}%{?pre:-%{pre}}
+%setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 
 %if 0%{?old_xcb}
 %patch0 -p1 -b .old_xcb
@@ -366,28 +372,17 @@ rm -fv mkspecs/linux-g++*/qmake.conf.multilib-optflags
 %patch4 -p1 -b .QTBUG-35459
 %patch12 -p1 -b .enable_ft_lcdfilter
 %patch25 -p1 -b .qdbusconnection_no_debug
+%patch13 -p1 -b .big-endian
 
 #patch50 -p1 -b .poll
-%patch51 -p1 -b .QTBUG-42985
+%patch51 -p1 -b .disconnect_displays
 %patch52 -p1 -b .QTBUG-33093
+%patch53 -p1 -b .QTBUG-45484
 
 %if 0%{?rhel} == 6
 %patch100 -p1 -b .QTBUG-43057
 %endif
-
-%patch208 -p1 -b .ibus_get_display_number
-
-%patch204 -p1 -b .0004
-%patch212 -p1 -b .0012
-%patch272 -p1 -b .0072
-%patch294 -p1 -b .0094
-%patch332 -p1 -b .0132
-%patch336 -p1 -b .0136
-%patch349 -p1 -b .0149
-%patch400 -p1 -b .0200
-%patch401 -p1 -b .0201
-%patch440 -p1 -b .0240
-%patch448 -p1 -b .0248
+%patch123 -p1 -b .QTBUG-46310
 
 # drop -fexceptions from $RPM_OPT_FLAGS
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
@@ -412,14 +407,13 @@ mv sqlite UNUSED/
 %endif
 popd
 
-
 # builds failing mysteriously on f20
 # ./configure: Permission denied
 # check to ensure that can't happen -- rex
 test -x configure || chmod +x configure
 
-%build
 
+%build
 # limit -reduce-relocations to %%ix86 x86_64 archs, https://bugreports.qt-project.org/browse/QTBUG-36129
 ./configure -v \
   -confirm-license \
@@ -479,12 +473,24 @@ test -x configure || chmod +x configure
 make %{?_smp_mflags}
 
 %if 0%{?docs}
-# wierd but necessary, to force regeration to use just-built qdoc
-rm -fv src/corelib/Makefile
+# qdoc
+# wierd but necessary, to force use of just-built qdoc
+rm -fv qmake/Makefile.qmake-docs src/corelib/Makefile
+pushd src; ../bin/qmake; make sub-qdoc; popd
+pushd src/corelib; ../../bin/qmake; popd
+pushd src/xml; ../../bin/qmake; popd
 # HACK to avoid multilib conflicts in noarch content
 # see also https://bugreports.qt-project.org/browse/QTBUG-42071
 QT_HASH_SEED=0; export QT_HASH_SEED
-make %{?_smp_mflags} docs
+%if 0%{?valgrind}
+mv bin/qdoc bin/qdoc.orig
+install %{SOURCE2} bin/qdoc
+%endif
+make html_docs
+%if 0%{?valgrind}
+mv bin/qdoc.orig bin/qdoc -f
+%endif
+make qch_docs
 %endif
 
 
@@ -532,6 +538,7 @@ sed -i \
 
 # create/own dirs
 mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
+mkdir -p %{buildroot}%{_sysconfdir}/xdg/QtProject
 
 # hardlink files to %{_bindir}, add -qt5 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
@@ -580,19 +587,17 @@ popd
 
 install -p -m755 -D %{SOURCE6} %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/10-qt5-check-opengl2.sh
 
-
 ## work-in-progress, doesn't work yet -- rex
 %check
 export CMAKE_PREFIX_PATH=%{buildroot}%{_prefix}
 export CTEST_OUTPUT_ON_FAILURE=1
 export PATH=%{buildroot}%{_bindir}:$PATH
 export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
-mkdir tests/auto/cmake/%{_target_platform}
+mkdir -p tests/auto/cmake/%{_target_platform}
 pushd tests/auto/cmake/%{_target_platform}
 cmake .. ||:
 ctest --output-on-failure ||:
 popd
-
 
 %if 0%{?qtchooser}
 %pre
@@ -639,7 +644,7 @@ fi
 %endif
 
 %files
-%doc LICENSE.LGPL* LGPL_EXCEPTION.txt
+%doc LICENSE.LGPL* LGPL_EXCEPTION.txt LICENSE.FDL
 %if 0%{?qtchooser}
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
@@ -647,6 +652,7 @@ fi
 %ghost %{_sysconfdir}/xdg/qtchooser/5.conf
 %{_sysconfdir}/xdg/qtchooser/5-%{__isa_bits}.conf
 %endif
+%dir %{_sysconfdir}/xdg/QtProject/
 %{_qt5_libdir}/libQt5Concurrent.so.5*
 %{_qt5_libdir}/libQt5Core.so.5*
 %{_qt5_libdir}/libQt5DBus.so.5*
@@ -682,7 +688,6 @@ fi
 %{_qt5_libdir}/cmake/Qt5Network/Qt5Network_QConnmanEnginePlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Network/Qt5Network_QGenericEnginePlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Network/Qt5Network_QNetworkManagerEnginePlugin.cmake
-#dir %{_qt5_plugindir}/accessible/
 %dir %{_qt5_plugindir}/designer/
 %dir %{_qt5_plugindir}/generic/
 %dir %{_qt5_plugindir}/iconengines/
@@ -706,8 +711,10 @@ fi
 %doc dist/README dist/changes-5.*
 %{_qt5_docdir}/*.qch
 %{_qt5_docdir}/qdoc/
+%if 0%{?examples}
 # included in -examples instead, see bug #1212750
 %exclude %{_qt5_docdir}/qdoc/examples-manifest.xml
+%endif
 %{_qt5_docdir}/qmake/
 %{_qt5_docdir}/qtconcurrent/
 %{_qt5_docdir}/qtcore/
@@ -782,6 +789,8 @@ fi
 %{_qt5_libdir}/libQt5Test.so
 %{_qt5_libdir}/libQt5Widgets.prl
 %{_qt5_libdir}/libQt5Widgets.so
+%{_qt5_libdir}/libQt5XcbQpa.prl
+%{_qt5_libdir}/libQt5XcbQpa.so
 %{_qt5_libdir}/libQt5Xml.prl
 %{_qt5_libdir}/libQt5Xml.so
 %{_qt5_libdir}/cmake/Qt5/Qt5Config*.cmake
@@ -811,7 +820,14 @@ fi
 %{_qt5_libdir}/pkgconfig/Qt5Sql.pc
 %{_qt5_libdir}/pkgconfig/Qt5Test.pc
 %{_qt5_libdir}/pkgconfig/Qt5Widgets.pc
+%{_qt5_libdir}/pkgconfig/Qt5XcbQpa.pc
 %{_qt5_libdir}/pkgconfig/Qt5Xml.pc
+%if 0%{?egl}
+%{_qt5_libdir}/libQt5EglDeviceIntegration.prl
+%{_qt5_libdir}/libQt5EglDeviceIntegration.so
+%{_qt5_libdir}/pkgconfig/Qt5EglDeviceIntegration.pc
+%endif
+
 
 %files static
 %{_qt5_libdir}/libQt5Bootstrap.*a
@@ -871,15 +887,21 @@ fi
 %{_qt5_libdir}/libQt5OpenGL.so.5*
 %{_qt5_libdir}/libQt5PrintSupport.so.5*
 %{_qt5_libdir}/libQt5Widgets.so.5*
-#{_qt5_plugindir}/accessible/libqtaccessiblewidgets.so
+%{_qt5_libdir}/libQt5XcbQpa.so.5*
 %{_qt5_plugindir}/generic/libqevdevkeyboardplugin.so
 %{_qt5_plugindir}/generic/libqevdevmouseplugin.so
 %{_qt5_plugindir}/generic/libqevdevtabletplugin.so
 %{_qt5_plugindir}/generic/libqevdevtouchplugin.so
+%if 0%{?libinput}
+%{_qt5_plugindir}/generic/libqlibinputplugin.so
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake
+%endif
+%{_qt5_plugindir}/generic/libqtuiotouchplugin.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevKeyboardPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevTabletPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevTouchScreenPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake
 %{_qt5_plugindir}/imageformats/libqgif.so
 %{_qt5_plugindir}/imageformats/libqico.so
 %{_qt5_plugindir}/imageformats/libqjpeg.so
@@ -891,12 +913,17 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QComposePlatformInputContextPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake
 %if 0%{?egl}
+%{_qt5_libdir}/libQt5EglDeviceIntegration.so.5*
 %{_qt5_plugindir}/platforms/libqeglfs.so
-%{_qt5_plugindir}/platforms/libqkms.so
 %{_qt5_plugindir}/platforms/libqminimalegl.so
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QKmsIntegrationPlugin.cmake
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-integration.so
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
+%{_qt5_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsIntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
 %endif
 %{_qt5_plugindir}/platforms/libqlinuxfb.so
 %{_qt5_plugindir}/platforms/libqminimal.so
@@ -906,6 +933,8 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake
+%{_qt5_plugindir}/xcbglintegrations/libqxcb-glx-integration.so
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbGlxIntegrationPlugin.cmake
 %{_qt5_plugindir}/platformthemes/libqgtk2.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGtk2ThemePlugin.cmake
 %{_qt5_plugindir}/printsupport/libcupsprintersupport.so
@@ -913,6 +942,88 @@ fi
 
 
 %changelog
+* Fri Aug 07 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.5.0-15
+- use valgrind to debug qdoc HTML generation
+
+* Fri Aug 07 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.5.0-14
+- remove GDB hackery again, -12 built fine on i686, hack breaks ARM build
+- fix 10-qt5-check-opengl2.sh for multiple screens (#1245755)
+
+* Thu Aug 06 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-13
+- use upstream commit/fix for QTBUG-46310
+- restore qdoc/gdb hackery, i686 still needs it :(
+
+* Wed Aug 05 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.5.0-12
+- remove GDB hackery, it is not producing useful backtraces for the ARM crash
+
+* Mon Aug 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-11
+- Add mesa-dri-drivers as recommends on gui package as reported by Kevin Kofler
+- Reference https://bugzilla.redhat.com/1249280
+
+* Wed Jul 29 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-10
+- -docs: BuildRequires: qt5-qhelpgenerator
+
+* Fri Jul 17 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-9
+- use qdoc.gdb wrapper
+
+* Wed Jul 15 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-8
+- %%build: hack around 'make docs' failures (on f22+)
+
+* Wed Jul 15 2015 Jan Grulich <jgrulich@redhat.com> 5.5.0-7
+- restore previously dropped patches
+
+* Tue Jul 14 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-6
+- disable bootstrap again
+
+* Tue Jul 14 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-5
+- enable bootstrap (and disable failing docs)
+
+* Mon Jul 13 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-4
+- Qt5 application crashes when connecting/disconnecting displays (#1083664)
+
+* Fri Jul 10 2015 Than Ngo <than@redhat.com> - 5.5.0-3
+- add better fix for compile error on big endian
+
+* Thu Jul 09 2015 Than Ngo <than@redhat.com> - 5.5.0-2
+- fix build failure on big endian platform (ppc64,s390x)
+
+* Mon Jun 29 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.5.rc
+- Second round of builds now with bootstrap enabled due new qttools
+
+* Mon Jun 29 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.4.rc
+- Enable bootstrap to first import on rawhide
+
+* Thu Jun 25 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.3.rc
+- Disable bootstrap
+
+* Wed Jun 24 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.2.rc
+- Update for official RC1 released packages
+
+* Mon Jun 15 2015 Daniel Vratil <dvratil@redhat.com> 5.5.0-0.1.rc
+- Qt 5.5 RC 1
+
+* Mon Jun 08 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.2-2
+- rebase to latest SM patches (QTBUG-45484, QTBUG-46310)
+
+* Tue Jun 02 2015 Jan Grulich <jgrulich@redhat.com> 5.4.2-1
+- Update to 5.4.2
+
+* Tue May 26 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-20
+- SM_CLIENT_ID property is not set (QTBUG-46310)
+
+* Mon May 25 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-19
+- QWidget::setWindowRole does nothing (QTBUG-45484)
+
+* Wed May 20 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-18
+- own /etc/xdg/QtProject
+- Requires: qt-settings (f22+)
+
+* Sat May 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-17
+- Try to ensure that -fPIC is used in CMake builds (QTBUG-45755)
+
+* Thu May 14 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-16
+- Some Qt apps crash if they are compiled with gcc5 (QTBUG-45755)
+
 * Thu May 07 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-15
 - try harder to avoid doc/multilib conflicts (#1212750)
 

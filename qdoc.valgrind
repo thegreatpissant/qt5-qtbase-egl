@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# run process through valgrind instead
+
+DIRNAME=$(dirname $0)
+set -x
+valgrind ${DIRNAME}/qdoc.orig $@
